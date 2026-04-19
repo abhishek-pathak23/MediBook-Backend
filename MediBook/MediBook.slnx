@@ -2,5 +2,6 @@
   <Folder Name="/services/">
     <Project Path="services/auth-service/auth-service.csproj" />
     <Project Path="services/provider-service/provider-service.csproj" />
+    <Project Path="services/schedule-service/schedule-service.csproj" />
   </Folder>
 </Solution>
