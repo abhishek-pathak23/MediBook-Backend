@@ -1,0 +1,89 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using provider_service.DTOs;
+using provider_service.Entities;
+using provider_service.Interfaces;
+
+namespace provider_service.Controllers
+{
+    [Route("api/v1/[controller]")]
+    [ApiController]
+    public class ProviderController : ControllerBase
+    {
+        private readonly IProviderService _providerService;
+
+        public ProviderController(IProviderService providerService)
+        {
+            _providerService = providerService;
+        }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult Register([FromBody] ProviderRegistrationDto dto)
+        {
+            var provider = _providerService.RegisterProvider(dto);
+            return CreatedAtAction(nameof(GetById), new { id = provider.ProviderId }, provider);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
+        {
+            var provider = _providerService.GetProviderById(id);
+            if (provider == null) return NotFound("Provider not found");
+            return Ok(provider);
+        }
+
+        [HttpGet("specialization/{specialization}")]
+        public IActionResult GetBySpecialization(string specialization)
+        {
+            var providers = _providerService.GetBySpecialization(specialization);
+            return Ok(providers);
+        }
+
+        [HttpGet("search")]
+        public IActionResult Search([FromQuery] string query)
+        {
+            var providers = _providerService.SearchProviders(query);
+            return Ok(providers);
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var providers = _providerService.GetAllProviders();
+            return Ok(providers);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize]
+        public IActionResult Update(int id, [FromBody] ProviderUpdateDto dto)
+        {
+            var provider = _providerService.UpdateProvider(id, dto);
+            return Ok(provider);
+        }
+
+        [HttpPut("{id}/verify")]
+        [Authorize] // In a real app, authorize for Admin only here
+        public IActionResult Verify(int id)
+        {
+            _providerService.VerifyProvider(id);
+            return Ok("Provider verified successfully.");
+        }
+
+        [HttpPut("{id}/availability")]
+        [Authorize]
+        public IActionResult SetAvailability(int id, [FromQuery] bool isAvailable)
+        {
+            _providerService.SetAvailability(id, isAvailable);
+            return Ok($"Availability set to {isAvailable}");
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public IActionResult Delete(int id)
+        {
+            _providerService.DeleteProvider(id);
+            return NoContent();
+        }
+    }
+}
