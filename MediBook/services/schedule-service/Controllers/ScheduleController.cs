@@ -107,6 +107,22 @@ namespace schedule_service.Controllers
             return NoContent();
         }
 
+        // Called by Appointment-Service via IHttpClientFactory to mark a slot as booked
+        [HttpPut("{id}/book")]
+        public IActionResult BookSlot(int id)
+        {
+            _schedService.BookSlot(id);
+            return NoContent();
+        }
+
+        // Called by Appointment-Service on cancellation/reschedule to free the slot
+        [HttpPut("{id}/release")]
+        public IActionResult ReleaseSlot(int id)
+        {
+            _schedService.ReleaseSlot(id);
+            return NoContent();
+        }
+
         [HttpPut("{id}")]
         [Authorize]
         public IActionResult UpdateSlot(int id, [FromBody] SlotUpdateDto dto)

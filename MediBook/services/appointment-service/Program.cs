@@ -1,29 +1,29 @@
+using appointment_service.Data;
+using appointment_service.Interfaces;
+using appointment_service.Middleware;
+using appointment_service.Repositories;
+using appointment_service.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using schedule_service.Data;
-using schedule_service.Interfaces;
-using schedule_service.Middleware;
-using schedule_service.Repositories;
-using schedule_service.Services;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MediBook Schedule API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MediBook Appointment API", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer 12345abcdef'",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Name        = "Authorization",
+        In          = ParameterLocation.Header,
+        Type        = SecuritySchemeType.ApiKey,
+        Scheme      = "Bearer"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
@@ -33,33 +33,41 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Id   = "Bearer"
                 },
                 Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header
+                Name   = "Bearer",
+                In     = ParameterLocation.Header
             },
             new List<string>()
         }
     });
 });
 
-// Database logic
+// Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Dependency Injection
-builder.Services.AddScoped<ISlotRepository, SlotRepository>();
-builder.Services.AddScoped<IScheduleService, ScheduleService>();
+// Typed HTTP client — IHttpClientFactory registered under IScheduleService
+builder.Services.AddHttpClient<IScheduleService, ScheduleHttpService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:ScheduleService"]
+        ?? "http://localhost:5298/");
+});
 
-// CORS logic
+// Dependency Injection
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<IPaymentService, PaymentHttpService>();
+
+// CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
@@ -85,7 +93,6 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

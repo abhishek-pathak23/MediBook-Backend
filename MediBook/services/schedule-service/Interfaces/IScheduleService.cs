@@ -10,6 +10,7 @@ namespace schedule_service.Interfaces
         List<AvailabilitySlot> GetAvailableSlots(int providerId, DateOnly date);
         AvailabilitySlot? GetSlotById(int slotId);
         void BookSlot(int slotId);
+        void ReleaseSlot(int slotId);
         void BlockSlot(int slotId);
         void UnblockSlot(int slotId);
         void DeleteSlot(int slotId);

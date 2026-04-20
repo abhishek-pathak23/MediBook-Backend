@@ -98,6 +98,14 @@ namespace schedule_service.Services
             _repo.SaveChanges();
         }
 
+        public void ReleaseSlot(int slotId)
+        {
+            var slot = _repo.GetById(slotId) ?? throw new KeyNotFoundException("Slot not found.");
+            slot.IsBooked = false;
+            _repo.UpdateSlot(slot);
+            _repo.SaveChanges();
+        }
+
         public void DeleteSlot(int slotId)
         {
             var slot = _repo.GetById(slotId) ?? throw new KeyNotFoundException("Slot not found.");
