@@ -39,5 +39,28 @@ namespace appointment_service.Services
                     $"Schedule-Service failed to release slot {slotId}. Status: {response.StatusCode}. Detail: {error}");
             }
         }
+
+        public async Task<bool> IsSlotAvailableAsync(int slotId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/v1/schedule/{slotId}");
+                if (!response.IsSuccessStatusCode) return false;
+
+                // Use JsonElement for safer dynamic parsing
+                var slot = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+                
+                bool isBooked = slot.GetProperty("isBooked").GetBoolean();
+                bool isBlocked = slot.GetProperty("isBlocked").GetBoolean();
+
+                // It's available only if it's NOT booked AND NOT blocked
+                return !isBooked && !isBlocked;
+            }
+            catch (Exception ex)
+            {
+                // If anything fails (like a missing property), we assume it's "not safe to book"
+                return false;
+            }
+        }
     }
 }

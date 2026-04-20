@@ -1,0 +1,52 @@
+# ========================
+# .NET Build Artifacts
+# ========================
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+
+# ========================
+# Visual Studio / Rider IDE
+# ========================
+.vs/
+.vscode/
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+.idea/
+
+# ========================
+# NuGet
+# ========================
+*.nupkg
+*.snupkg
+project.lock.json
+packages/
+!**/packages/repositories.config
+
+# ========================
+# Environment & Secrets
+# (appsettings.json contains JWT keys — replace with env vars in production)
+# ========================
+appsettings.Local.json
+.env.local
+.env.production
+
+# ========================
+# OS Artifacts
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# Test Results
+# ========================
+TestResults/
+*.trx
+*.coverage

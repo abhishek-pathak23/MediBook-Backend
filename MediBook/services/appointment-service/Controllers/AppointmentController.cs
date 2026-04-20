@@ -20,33 +20,43 @@ namespace appointment_service.Controllers
         // POST /api/v1/appointments — Book a new appointment
         [HttpPost]
         [Authorize]
-        public IActionResult Book([FromBody] AppointmentCreateDto dto)
+        public async Task<IActionResult> Book([FromBody] AppointmentCreateDto dto)
         {
-            var appointment = new Appointment
-            {
-                PatientId        = dto.PatientId,
-                ProviderId       = dto.ProviderId,
-                SlotId           = dto.SlotId,
-                ServiceType      = dto.ServiceType,
-                AppointmentDate  = dto.AppointmentDate,
-                StartTime        = dto.StartTime,
-                EndTime          = dto.EndTime,
-                Notes            = dto.Notes,
-                ModeOfConsultation = dto.ModeOfConsultation
-            };
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            var result = _apptService.BookAppointment(appointment);
-            return CreatedAtAction(nameof(GetById), new { id = result.AppointmentId }, result);
+            try
+            {
+                var appointment = new Appointment
+                {
+                    PatientId = dto.PatientId,
+                    ProviderId = dto.ProviderId,
+                    SlotId = dto.SlotId,
+                    ServiceType = dto.ServiceType,
+                    AppointmentDate = dto.AppointmentDate,
+                    StartTime = dto.StartTime,
+                    EndTime = dto.EndTime,
+                    Notes = dto.Notes,
+                    ModeOfConsultation = dto.ModeOfConsultation
+                };
+
+                var result = await _apptService.BookAppointmentAsync(appointment);
+                return CreatedAtAction(nameof(GetById), new { id = result.AppointmentId }, result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
-        // GET /api/v1/appointments/{id}
         [HttpGet("{id}")]
-        [Authorize]
         public IActionResult GetById(int id)
         {
-            var appt = _apptService.GetById(id);
-            if (appt == null) return NotFound("Appointment not found.");
-            return Ok(appt);
+            var appointment = _apptService.GetById(id);
+            if (appointment == null)
+                return NotFound();
+
+            return Ok(appointment);
         }
 
         // GET /api/v1/appointments/patient/{patientId}
@@ -97,19 +107,41 @@ namespace appointment_service.Controllers
         // PUT /api/v1/appointments/{id}/cancel
         [HttpPut("{id}/cancel")]
         [Authorize]
-        public IActionResult Cancel(int id)
+        public async Task<IActionResult> Cancel(int id)
         {
-            _apptService.CancelAppointment(id);
-            return NoContent();
+            try
+            {
+                await _apptService.CancelAppointmentAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         // PUT /api/v1/appointments/{id}/reschedule
         [HttpPut("{id}/reschedule")]
         [Authorize]
-        public IActionResult Reschedule(int id, [FromBody] AppointmentRescheduleDto dto)
+        public async Task<IActionResult> Reschedule(int id, [FromBody] AppointmentRescheduleDto dto)
         {
-            var updated = _apptService.RescheduleAppointment(id, dto.NewSlotId);
-            return Ok(updated);
+            try
+            {
+                var updated = await _apptService.RescheduleAppointmentAsync(id, dto.NewSlotId);
+                return Ok(updated);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         // PUT /api/v1/appointments/{id}/complete
@@ -117,17 +149,39 @@ namespace appointment_service.Controllers
         [Authorize]
         public IActionResult Complete(int id)
         {
-            _apptService.CompleteAppointment(id);
-            return NoContent();
+            try
+            {
+                _apptService.CompleteAppointment(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         // PUT /api/v1/appointments/{id}/status
         [HttpPut("{id}/status")]
         [Authorize]
-        public IActionResult UpdateStatus(int id, [FromBody] AppointmentStatusUpdateDto dto)
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] AppointmentStatusUpdateDto dto)
         {
-            var newStatus = _apptService.UpdateStatus(id, dto.Status);
-            return Ok(new { id, status = newStatus });
+            try
+            {
+                var newStatus = await _apptService.UpdateStatusAsync(id, dto.Status);
+                return Ok(new { id, status = newStatus });
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

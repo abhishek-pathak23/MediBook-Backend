@@ -25,13 +25,22 @@ namespace appointment_service.Services
             _paySvc = paySvc;
         }
 
-        public Appointment BookAppointment(Appointment appointment)
+        public async Task<Appointment> BookAppointmentAsync(Appointment appointment)
         {
-            // Guard: prevent double-booking the same slot
+            // --- NEW: SLOT VALIDATION GUARD ---
+            // Verify with Schedule-Service BEFORE doing anything else
+            var isAvailable = await _schedSvc.IsSlotAvailableAsync(appointment.SlotId);
+            if (!isAvailable)
+            {
+                throw new InvalidOperationException(
+                    $"Slot {appointment.SlotId} is not available. It may not exist, be blocked, or already booked.");
+            }
+
+            // Guard: prevent double-booking the same slot in OUR database
             var existing = _repo.FindBySlotId(appointment.SlotId);
             if (existing != null && existing.Status != "Cancelled")
                 throw new InvalidOperationException(
-                    $"Slot {appointment.SlotId} is already booked by appointment {existing.AppointmentId}.");
+                    $"Slot {appointment.SlotId} is already booked in our system by appointment {existing.AppointmentId}.");
 
             appointment.Status = "Scheduled";
             appointment.CreatedAt = DateTime.UtcNow;
@@ -42,10 +51,14 @@ namespace appointment_service.Services
                 throw new Exception("Failed to persist the appointment.");
 
             // Notify schedule-service to mark slot as booked
-            _schedSvc.BookSlotAsync(appointment.SlotId).GetAwaiter().GetResult();
+            await _schedSvc.BookSlotAsync(appointment.SlotId);
 
             return appointment;
         }
+
+        // Compatibility bridge
+        public Appointment BookAppointment(Appointment appointment) =>
+            BookAppointmentAsync(appointment).GetAwaiter().GetResult();
 
         public Appointment? GetById(int id) =>
             _repo.GetById(id);
@@ -59,7 +72,7 @@ namespace appointment_service.Services
         public List<Appointment> GetByProviderAndDate(int providerId, DateOnly date) =>
             _repo.FindByProviderIdAndAppointmentDate(providerId, date);
 
-        public void CancelAppointment(int id)
+        public async Task CancelAppointmentAsync(int id)
         {
             var appt = _repo.GetById(id) ?? throw new KeyNotFoundException("Appointment not found.");
 
@@ -76,13 +89,16 @@ namespace appointment_service.Services
             _repo.SaveChanges();
 
             // Release the slot back in schedule-service
-            _schedSvc.ReleaseSlotAsync(appt.SlotId).GetAwaiter().GetResult();
+            await _schedSvc.ReleaseSlotAsync(appt.SlotId);
 
             // Trigger refund via payment-service (stub for now)
-            _paySvc.TriggerRefundAsync(appt.AppointmentId).GetAwaiter().GetResult();
+            await _paySvc.TriggerRefundAsync(appt.AppointmentId);
         }
 
-        public Appointment RescheduleAppointment(int id, int newSlotId)
+        public void CancelAppointment(int id) => 
+            CancelAppointmentAsync(id).GetAwaiter().GetResult();
+
+        public async Task<Appointment> RescheduleAppointmentAsync(int id, int newSlotId)
         {
             var appt = _repo.GetById(id) ?? throw new KeyNotFoundException("Appointment not found.");
 
@@ -90,10 +106,15 @@ namespace appointment_service.Services
                 throw new InvalidOperationException(
                     $"Only 'Scheduled' appointments can be rescheduled. Current status: {appt.Status}.");
 
-            // Guard: ensure new slot is not already taken
+            // Verify new slot
+            var isAvailable = await _schedSvc.IsSlotAvailableAsync(newSlotId);
+            if (!isAvailable)
+                throw new InvalidOperationException($"New slot {newSlotId} is not available.");
+
+            // Guard: ensure new slot is not already taken in our DB
             var newSlotConflict = _repo.FindBySlotId(newSlotId);
             if (newSlotConflict != null && newSlotConflict.Status != "Cancelled")
-                throw new InvalidOperationException($"New slot {newSlotId} is already booked.");
+                throw new InvalidOperationException($"New slot {newSlotId} is already booked in our system.");
 
             var oldSlotId = appt.SlotId;
 
@@ -105,8 +126,8 @@ namespace appointment_service.Services
             _repo.SaveChanges();
 
             // Release old slot and book new slot
-            _schedSvc.ReleaseSlotAsync(oldSlotId).GetAwaiter().GetResult();
-            _schedSvc.BookSlotAsync(newSlotId).GetAwaiter().GetResult();
+            await _schedSvc.ReleaseSlotAsync(oldSlotId);
+            await _schedSvc.BookSlotAsync(newSlotId);
 
             return appt;
         }
@@ -126,7 +147,7 @@ namespace appointment_service.Services
             _repo.SaveChanges();
         }
 
-        public string UpdateStatus(int id, string status)
+        public async Task<string> UpdateStatusAsync(int id, string status)
         {
             if (!ValidStatuses.Contains(status))
                 throw new ArgumentException(
@@ -142,6 +163,9 @@ namespace appointment_service.Services
 
             return appt.Status;
         }
+
+        public string UpdateStatus(int id, string status) =>
+            UpdateStatusAsync(id, status).GetAwaiter().GetResult();
 
         public List<Appointment> GetUpcomingByPatient(int patientId) =>
             _repo.FindUpcomingByPatientId(patientId);

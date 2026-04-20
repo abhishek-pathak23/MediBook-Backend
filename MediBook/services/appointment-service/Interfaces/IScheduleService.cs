@@ -8,5 +8,6 @@ namespace appointment_service.Interfaces
     {
         Task BookSlotAsync(int slotId);
         Task ReleaseSlotAsync(int slotId);
+        Task<bool> IsSlotAvailableAsync(int slotId);
     }
 }
