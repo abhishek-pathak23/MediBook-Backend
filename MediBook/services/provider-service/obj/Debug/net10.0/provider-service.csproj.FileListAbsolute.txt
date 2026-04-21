@@ -1,8 +1,0 @@
-C:\OnlineAppointmentBookingPlatform\MediBook\services\provider-service\obj\Debug\net10.0\provider-service.csproj.AssemblyReference.cache
-C:\OnlineAppointmentBookingPlatform\MediBook\services\provider-service\obj\Debug\net10.0\rpswa.dswa.cache.json
-C:\OnlineAppointmentBookingPlatform\MediBook\services\provider-service\obj\Debug\net10.0\provider-service.GeneratedMSBuildEditorConfig.editorconfig
-C:\OnlineAppointmentBookingPlatform\MediBook\services\provider-service\obj\Debug\net10.0\provider-service.AssemblyInfoInputs.cache
-C:\OnlineAppointmentBookingPlatform\MediBook\services\provider-service\obj\Debug\net10.0\provider-service.AssemblyInfo.cs
-C:\OnlineAppointmentBookingPlatform\MediBook\services\provider-service\obj\Debug\net10.0\provider-service.csproj.CoreCompileInputs.cache
-C:\OnlineAppointmentBookingPlatform\MediBook\services\provider-service\obj\Debug\net10.0\provider-service.MvcApplicationPartsAssemblyInfo.cs
-C:\OnlineAppointmentBookingPlatform\MediBook\services\provider-service\obj\Debug\net10.0\provider-service.MvcApplicationPartsAssemblyInfo.cache
