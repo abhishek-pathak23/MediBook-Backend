@@ -3,12 +3,6 @@ using payment_service.Interfaces;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using QuestPDF.Previewer; // Not strictly needed for generation
-using payment_service.Entities;
-using payment_service.Interfaces;
-using QuestPDF.Fluent;
-using QuestPDF.Helpers;
-using QuestPDF.Infrastructure;
 
 namespace payment_service.Services
 {

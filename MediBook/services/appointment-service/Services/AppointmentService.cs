@@ -27,13 +27,40 @@ namespace appointment_service.Services
 
         public async Task<Appointment> BookAppointmentAsync(Appointment appointment)
         {
-            // --- NEW: SLOT VALIDATION GUARD ---
-            // Verify with Schedule-Service BEFORE doing anything else
-            var isAvailable = await _schedSvc.IsSlotAvailableAsync(appointment.SlotId);
-            if (!isAvailable)
+            // --- UPDATED: COMPREHENSIVE SLOT VALIDATION ---
+            var slot = await _schedSvc.GetSlotDetailsAsync(appointment.SlotId);
+            if (slot == null)
+            {
+                throw new InvalidOperationException($"Slot {appointment.SlotId} not found.");
+            }
+
+            // 1. Availability Guard
+            bool isBooked = slot.Value.GetProperty("isBooked").GetBoolean();
+            bool isBlocked = slot.Value.GetProperty("isBlocked").GetBoolean();
+            if (isBooked || isBlocked)
+            {
+                throw new InvalidOperationException($"Slot {appointment.SlotId} is not available (Booked or Blocked).");
+            }
+
+            // 2. Integrity Guard: Verify requested doctor and TIMES match the slot owner
+            int slotProviderId = slot.Value.GetProperty("providerId").GetInt32();
+            if (slotProviderId != appointment.ProviderId)
             {
                 throw new InvalidOperationException(
-                    $"Slot {appointment.SlotId} is not available. It may not exist, be blocked, or already booked.");
+                    "Integrity Mismatch: Slot belongs to a different Provider.");
+            }
+
+            // Verify Time/Date Accuracy
+            var slotDate = DateOnly.Parse(slot.Value.GetProperty("date").GetString()!);
+            var slotStart = TimeOnly.Parse(slot.Value.GetProperty("startTime").GetString()!);
+            var slotEnd = TimeOnly.Parse(slot.Value.GetProperty("endTime").GetString()!);
+
+            if (appointment.AppointmentDate != slotDate || 
+                appointment.StartTime != slotStart || 
+                appointment.EndTime != slotEnd)
+            {
+                throw new InvalidOperationException(
+                    "Time Mismatch: The requested appointment time does not match the chosen Slot's official schedule.");
             }
 
             // Guard: prevent double-booking the same slot in OUR database
@@ -82,14 +109,16 @@ namespace appointment_service.Services
             if (appt.Status == "Cancelled")
                 throw new InvalidOperationException("Appointment is already cancelled.");
 
+            // --- STEP 1: TEll REMOTE SERVICE FIRST ---
+            // If this fails, the local DB stays 'Scheduled' (Consistent)
+            await _schedSvc.ReleaseSlotAsync(appt.SlotId);
+
+            // --- STEP 2: UPDATE LOCAL DB ONLY IF REMOTE SUCCEEDED ---
             appt.SetStatus("Cancelled");
             appt.UpdatedAt = DateTime.UtcNow;
 
             _repo.Update(appt);
             _repo.SaveChanges();
-
-            // Release the slot back in schedule-service
-            await _schedSvc.ReleaseSlotAsync(appt.SlotId);
 
             // Trigger refund via payment-service (stub for now)
             await _paySvc.TriggerRefundAsync(appt.AppointmentId);
@@ -107,9 +136,23 @@ namespace appointment_service.Services
                     $"Only 'Scheduled' appointments can be rescheduled. Current status: {appt.Status}.");
 
             // Verify new slot
-            var isAvailable = await _schedSvc.IsSlotAvailableAsync(newSlotId);
-            if (!isAvailable)
+            var slot = await _schedSvc.GetSlotDetailsAsync(newSlotId);
+            if (slot == null)
+                throw new InvalidOperationException($"New slot {newSlotId} not found.");
+
+            // 1. Availability Guard
+            if (slot.Value.GetProperty("isBooked").GetBoolean() || 
+                slot.Value.GetProperty("isBlocked").GetBoolean())
+            {
                 throw new InvalidOperationException($"New slot {newSlotId} is not available.");
+            }
+
+            // 2. Integrity Guard: Verify doctor
+            if (slot.Value.GetProperty("providerId").GetInt32() != appt.ProviderId)
+            {
+                throw new InvalidOperationException(
+                    "Integrity Mismatch: New slot belongs to a different Provider.");
+            }
 
             // Guard: ensure new slot is not already taken in our DB
             var newSlotConflict = _repo.FindBySlotId(newSlotId);
@@ -118,16 +161,19 @@ namespace appointment_service.Services
 
             var oldSlotId = appt.SlotId;
 
-            // Update appointment to new slot
+            // --- STEP 1: PREPARE REMOTE SLOTS FIRST ---
+            await _schedSvc.BookSlotAsync(newSlotId);      // Book new
+            await _schedSvc.ReleaseSlotAsync(oldSlotId);   // Release old
+
+            // --- STEP 2: UPDATE LOCAL DB ONLY IF REMOTE SUCCEEDED ---
             appt.SlotId = newSlotId;
+            appt.AppointmentDate = DateOnly.Parse(slot.Value.GetProperty("date").GetString()!);
+            appt.StartTime = TimeOnly.Parse(slot.Value.GetProperty("startTime").GetString()!);
+            appt.EndTime = TimeOnly.Parse(slot.Value.GetProperty("endTime").GetString()!);
             appt.UpdatedAt = DateTime.UtcNow;
 
             _repo.Update(appt);
             _repo.SaveChanges();
-
-            // Release old slot and book new slot
-            await _schedSvc.ReleaseSlotAsync(oldSlotId);
-            await _schedSvc.BookSlotAsync(newSlotId);
 
             return appt;
         }

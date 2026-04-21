@@ -24,10 +24,12 @@ namespace appointment_service.Data
             modelBuilder.Entity<Appointment>()
                 .HasIndex(a => a.PatientId);
 
-            // Unique constraint: one active booking per slot
+            // UNIQUE GUARD: Only one active booking allowed per slot.
+            // This prevents "Ghost Appointments" even if two users click 'Book' at the same time.
             modelBuilder.Entity<Appointment>()
                 .HasIndex(a => a.SlotId)
-                .IsUnique(false); // Not unique — cancelled slots can be re-booked
+                .IsUnique()
+                .HasFilter("[Status] != 'Cancelled'");
         }
     }
 }

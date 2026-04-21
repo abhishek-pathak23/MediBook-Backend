@@ -11,7 +11,18 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Add Data Access & Services
+// 1. Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", corsBuilder =>
+    {
+        corsBuilder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+    });
+});
+
+// 2. Add Data Access & Services
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -86,6 +97,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable CORS
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();

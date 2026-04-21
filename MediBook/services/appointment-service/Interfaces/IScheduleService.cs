@@ -8,6 +8,10 @@ namespace appointment_service.Interfaces
     {
         Task BookSlotAsync(int slotId);
         Task ReleaseSlotAsync(int slotId);
-        Task<bool> IsSlotAvailableAsync(int slotId);
+        
+        /// <summary>
+        /// Returns slot details (ProviderId, IsBooked, IsBlocked) or null if not found.
+        /// </summary>
+        Task<System.Text.Json.JsonElement?> GetSlotDetailsAsync(int slotId);
     }
 }

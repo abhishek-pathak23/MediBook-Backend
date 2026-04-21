@@ -22,6 +22,11 @@ namespace appointment_service.Controllers
         [Authorize]
         public async Task<IActionResult> Book([FromBody] AppointmentCreateDto dto)
         {
+            // SECURITY: Get UserId from JWT claims instead of trusting the DTO (Prevents IDOR)
+            var userIdString = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdString, out int userId))
+                return Unauthorized(new { message = "Invalid or expired user identity." });
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -29,7 +34,7 @@ namespace appointment_service.Controllers
             {
                 var appointment = new Appointment
                 {
-                    PatientId = dto.PatientId,
+                    PatientId = userId, // Authenticated UserId forced here
                     ProviderId = dto.ProviderId,
                     SlotId = dto.SlotId,
                     ServiceType = dto.ServiceType,

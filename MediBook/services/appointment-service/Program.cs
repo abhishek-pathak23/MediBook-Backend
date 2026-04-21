@@ -55,10 +55,17 @@ builder.Services.AddHttpClient<IScheduleService, ScheduleHttpService>(client =>
         ?? "http://localhost:5298/");
 });
 
+// Typed HTTP client — IHttpClientFactory registered under IPaymentService
+builder.Services.AddHttpClient<IPaymentService, PaymentHttpService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:PaymentService"]
+        ?? "http://localhost:5004/");
+});
+
 // Dependency Injection
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
-builder.Services.AddScoped<IPaymentService, PaymentHttpService>();
 
 // CORS
 builder.Services.AddCors(options =>

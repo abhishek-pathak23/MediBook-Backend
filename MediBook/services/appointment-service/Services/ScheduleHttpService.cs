@@ -1,24 +1,30 @@
 using appointment_service.Interfaces;
+using System.Net.Http.Headers;
 
 namespace appointment_service.Services
 {
     /// <summary>
     /// Communicates with the Schedule-Service via IHttpClientFactory.
     /// Calls PUT /api/v1/schedule/{id}/book to mark a slot as booked,
-    /// and PUT /api/v1/schedule/{id}/release to free a slot on cancellation.
+    /// PUT /api/v1/schedule/{id}/release to free a slot on cancellation,
+    /// and GET /api/v1/schedule/{id} to verify slot availability.
     /// </summary>
     public class ScheduleHttpService : IScheduleService
     {
         private readonly HttpClient _httpClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ScheduleHttpService(HttpClient httpClient)
+        public ScheduleHttpService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task BookSlotAsync(int slotId)
         {
-            var response = await _httpClient.PutAsync($"api/v1/schedule/{slotId}/book", null);
+            PropagateAuthorizationHeader();
+
+            var response = await _httpClient.PutAsync($"api/v1/Schedule/{slotId}/book", null);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -30,7 +36,9 @@ namespace appointment_service.Services
 
         public async Task ReleaseSlotAsync(int slotId)
         {
-            var response = await _httpClient.PutAsync($"api/v1/schedule/{slotId}/release", null);
+            PropagateAuthorizationHeader();
+
+            var response = await _httpClient.PutAsync($"api/v1/Schedule/{slotId}/release", null);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -40,26 +48,31 @@ namespace appointment_service.Services
             }
         }
 
-        public async Task<bool> IsSlotAvailableAsync(int slotId)
+        public async Task<System.Text.Json.JsonElement?> GetSlotDetailsAsync(int slotId)
         {
+            PropagateAuthorizationHeader();
+
             try
             {
-                var response = await _httpClient.GetAsync($"api/v1/schedule/{slotId}");
-                if (!response.IsSuccessStatusCode) return false;
+                var response = await _httpClient.GetAsync($"api/v1/Schedule/{slotId}");
+                if (!response.IsSuccessStatusCode) return null;
 
-                // Use JsonElement for safer dynamic parsing
-                var slot = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
-                
-                bool isBooked = slot.GetProperty("isBooked").GetBoolean();
-                bool isBlocked = slot.GetProperty("isBlocked").GetBoolean();
-
-                // It's available only if it's NOT booked AND NOT blocked
-                return !isBooked && !isBlocked;
+                return await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // If anything fails (like a missing property), we assume it's "not safe to book"
-                return false;
+                return null;
+            }
+        }
+
+        private void PropagateAuthorizationHeader()
+        {
+            var context = _httpContextAccessor.HttpContext;
+            if (context != null && context.Request.Headers.TryGetValue("Authorization", out var authHeader))
+            {
+                var token = authHeader.ToString().Replace("Bearer ", "");
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", token);
             }
         }
     }

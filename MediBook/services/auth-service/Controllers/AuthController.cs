@@ -25,8 +25,8 @@ public class AuthController : ControllerBase
             FullName = request.FullName,
             Email = request.Email,
             Phone = request.Phone,
-            Role = request.Role,
-            Provider = request.Provider,
+            Role = "Patient", // SECURITY: Force all public registrations to Patient role
+            Provider = null,   // SECURITY: Cannot self-assign a provider profile
             ProfilePicUrl = request.ProfilePicUrl
         };
 
@@ -82,7 +82,7 @@ public class AuthController : ControllerBase
         if (email == null) return Unauthorized();
 
         var user = await _authService.GetUserByEmail(email);
-        return Ok(user);
+        return Ok(ToProfileDto(user));
     }
 
     [HttpPut("profile")]
@@ -101,7 +101,7 @@ public class AuthController : ControllerBase
         };
 
         var updatedUser = await _authService.UpdateProfile(userId, updateEntity);
-        return Ok(updatedUser);
+        return Ok(ToProfileDto(updatedUser));
     }
 
     [HttpPut("password")]
@@ -125,4 +125,16 @@ public class AuthController : ControllerBase
         await _authService.DeactivateAccount(userId);
         return Ok(new { message = "Account deactivated" });
     }
+
+    private static UserProfileDto ToProfileDto(User user) => new UserProfileDto
+    {
+        UserId = user.UserId,
+        FullName = user.FullName,
+        Email = user.Email,
+        Phone = user.Phone,
+        Role = user.Role,
+        Provider = user.Provider,
+        ProfilePicUrl = user.ProfilePicUrl,
+        CreatedAt = user.CreatedAt
+    };
 }

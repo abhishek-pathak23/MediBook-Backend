@@ -30,17 +30,24 @@ public class ExceptionHandlingMiddleware
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
-        
-        // Map common business errors to standard HTTP status codes
-        context.Response.StatusCode = exception.Message switch
+
+        // Map exception types to standard HTTP status codes (matches other services)
+        var statusCode = exception switch
         {
-            "User with this email already exists." => (int)HttpStatusCode.Conflict,
-            "Invalid credentials." => (int)HttpStatusCode.Unauthorized,
-            "Account is deactivated." => (int)HttpStatusCode.Forbidden,
-            _ => (int)HttpStatusCode.InternalServerError
+            InvalidOperationException => (int)HttpStatusCode.BadRequest,
+            ArgumentException         => (int)HttpStatusCode.BadRequest,
+            KeyNotFoundException      => (int)HttpStatusCode.NotFound,
+            UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
+            _                         => (int)HttpStatusCode.InternalServerError
         };
 
-        var result = JsonSerializer.Serialize(new { error = exception.Message });
+        context.Response.StatusCode = statusCode;
+
+        var result = JsonSerializer.Serialize(new
+        {
+            error      = exception.Message,
+            statusCode = statusCode
+        });
         return context.Response.WriteAsync(result);
     }
 }
