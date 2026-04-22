@@ -7,5 +7,6 @@
     <Project Path="services/appointment-service/appointment-service.csproj" />
     <Project Path="services/review-service/review-service.csproj" />
     <Project Path="services/notification-service/notification-service.csproj" />
+    <Project Path="services/medical-record-service/medical-record-service.csproj" />
   </Folder>
 </Solution>

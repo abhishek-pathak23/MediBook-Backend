@@ -18,7 +18,7 @@ namespace provider_service.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult Register([FromBody] ProviderRegistrationDto dto)
         {
             var provider = _providerService.RegisterProvider(dto);
@@ -55,7 +55,7 @@ namespace provider_service.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Provider,Admin")]
         public IActionResult Update(int id, [FromBody] ProviderUpdateDto dto)
         {
             var provider = _providerService.UpdateProvider(id, dto);
@@ -63,7 +63,7 @@ namespace provider_service.Controllers
         }
 
         [HttpPut("{id}/verify")]
-        [Authorize] // In a real app, authorize for Admin only here
+        [Authorize(Roles = "Admin")]
         public IActionResult Verify(int id)
         {
             _providerService.VerifyProvider(id);
@@ -71,7 +71,7 @@ namespace provider_service.Controllers
         }
 
         [HttpPut("{id}/availability")]
-        [Authorize]
+        [Authorize(Roles = "Provider,Admin")]
         public IActionResult SetAvailability(int id, [FromQuery] bool isAvailable)
         {
             _providerService.SetAvailability(id, isAvailable);
@@ -79,7 +79,7 @@ namespace provider_service.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             _providerService.DeleteProvider(id);

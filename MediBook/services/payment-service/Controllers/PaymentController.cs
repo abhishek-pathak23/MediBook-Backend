@@ -67,6 +67,7 @@ namespace payment_service.Controllers
         }
 
         [HttpGet("history")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetHistory()
         {
             var history = _paymentService.GetPaymentHistory();
@@ -74,6 +75,7 @@ namespace payment_service.Controllers
         }
 
         [HttpPost("refund/{appointmentId}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Refund(int appointmentId)
         {
             try
@@ -120,6 +122,7 @@ namespace payment_service.Controllers
         }
 
         [HttpGet("revenue/{providerId}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetTotalRevenue(int providerId)
         {
             var revenue = _paymentService.GetTotalRevenueByProvider(providerId);
@@ -127,6 +130,7 @@ namespace payment_service.Controllers
         }
         
         [HttpGet("revenue/all")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetAllRevenue()
         {
             var revenue = _paymentService.GetTotalRevenue();

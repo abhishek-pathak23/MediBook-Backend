@@ -126,6 +126,15 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Account deactivated" });
     }
 
+    [HttpGet("users")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var users = await _authService.GetAllUsers();
+        var dtos = users.Select(ToProfileDto).ToList();
+        return Ok(dtos);
+    }
+
     private static UserProfileDto ToProfileDto(User user) => new UserProfileDto
     {
         UserId = user.UserId,

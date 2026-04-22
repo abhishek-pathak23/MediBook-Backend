@@ -8,6 +8,7 @@ namespace appointment_service.Services
         private readonly IAppointmentRepository _repo;
         private readonly IScheduleService _schedSvc;
         private readonly IPaymentService _paySvc;
+        private readonly INotificationService _notificationSvc;
 
         private static readonly HashSet<string> ValidStatuses =
             new(StringComparer.OrdinalIgnoreCase)
@@ -18,11 +19,13 @@ namespace appointment_service.Services
         public AppointmentService(
             IAppointmentRepository repo,
             IScheduleService schedSvc,
-            IPaymentService paySvc)
+            IPaymentService paySvc,
+            INotificationService notificationSvc)
         {
             _repo = repo;
             _schedSvc = schedSvc;
             _paySvc = paySvc;
+            _notificationSvc = notificationSvc;
         }
 
         public async Task<Appointment> BookAppointmentAsync(Appointment appointment)
@@ -80,6 +83,17 @@ namespace appointment_service.Services
             // Notify schedule-service to mark slot as booked
             await _schedSvc.BookSlotAsync(appointment.SlotId);
 
+            // Send Booking Confirmation
+            try
+            {
+                await _notificationSvc.SendBookingConfirmationAsync(appointment.PatientId, appointment.ProviderId, appointment.AppointmentId);
+            }
+            catch (Exception ex)
+            {
+                // Log and swallow so the booking doesn't fail if notification fails
+                Console.WriteLine($"Warning: Failed to send booking notification. {ex.Message}");
+            }
+
             return appointment;
         }
 
@@ -122,6 +136,17 @@ namespace appointment_service.Services
 
             // Trigger refund via payment-service (stub for now)
             await _paySvc.TriggerRefundAsync(appt.AppointmentId);
+
+            // Send Cancellation Alert
+            try
+            {
+                await _notificationSvc.SendCancellationAlertAsync(appt.PatientId, appt.ProviderId, appt.AppointmentId);
+            }
+            catch (Exception ex)
+            {
+                // Log and swallow so the cancellation doesn't fail if notification fails
+                Console.WriteLine($"Warning: Failed to send cancellation notification. {ex.Message}");
+            }
         }
 
         public void CancelAppointment(int id) => 
@@ -218,5 +243,8 @@ namespace appointment_service.Services
 
         public int GetAppointmentCount(int providerId) =>
             _repo.CountByProviderId(providerId);
+
+        public List<Appointment> GetAllAppointments() =>
+            _repo.GetAll();
     }
 }

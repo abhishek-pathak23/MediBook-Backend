@@ -44,6 +44,11 @@ public class UserRepository : IUserRepository
         return await _context.Users.Where(u => u.FullName.Contains(name)).ToListAsync();
     }
 
+    public async Task<List<User>> GetAll()
+    {
+        return await _context.Users.ToListAsync();
+    }
+
     public async Task DeleteByUserId(int id)
     {
         var user = await _context.Users.FindAsync(id);

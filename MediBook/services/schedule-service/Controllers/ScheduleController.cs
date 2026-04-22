@@ -18,7 +18,7 @@ namespace schedule_service.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Provider,Admin")]
         public IActionResult AddSlot([FromBody] SlotCreateDto dto)
         {
             var slot = new AvailabilitySlot
@@ -35,7 +35,7 @@ namespace schedule_service.Controllers
         }
 
         [HttpPost("bulk")]
-        [Authorize]
+        [Authorize(Roles = "Provider,Admin")]
         public IActionResult AddBulk([FromBody] List<SlotCreateDto> dtos)
         {
             var slots = dtos.Select(dto => new AvailabilitySlot
@@ -52,7 +52,7 @@ namespace schedule_service.Controllers
         }
 
         [HttpPost("recurring")]
-        [Authorize]
+        [Authorize(Roles = "Provider,Admin")]
         public IActionResult GenerateRecurring([FromBody] RecurringSlotCreateDto dto)
         {
             var generatedSlots = _schedService.GenerateRecurringSlots(
@@ -92,7 +92,7 @@ namespace schedule_service.Controllers
         }
 
         [HttpPut("{id}/block")]
-        [Authorize]
+        [Authorize(Roles = "Provider,Admin")]
         public IActionResult BlockSlot(int id)
         {
             _schedService.BlockSlot(id);
@@ -100,7 +100,7 @@ namespace schedule_service.Controllers
         }
 
         [HttpPut("{id}/unblock")]
-        [Authorize]
+        [Authorize(Roles = "Provider,Admin")]
         public IActionResult UnblockSlot(int id)
         {
             _schedService.UnblockSlot(id);
@@ -126,7 +126,7 @@ namespace schedule_service.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Provider,Admin")]
         public IActionResult UpdateSlot(int id, [FromBody] SlotUpdateDto dto)
         {
             var slotState = new AvailabilitySlot
@@ -143,7 +143,7 @@ namespace schedule_service.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Provider,Admin")]
         public IActionResult DeleteSlot(int id)
         {
             _schedService.DeleteSlot(id);

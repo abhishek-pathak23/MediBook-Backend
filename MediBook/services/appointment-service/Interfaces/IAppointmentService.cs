@@ -16,5 +16,6 @@ namespace appointment_service.Interfaces
         Task<string> UpdateStatusAsync(int id, string status);
         List<Appointment> GetUpcomingByPatient(int patientId);
         int GetAppointmentCount(int providerId);
+        List<Appointment> GetAllAppointments();
     }
 }

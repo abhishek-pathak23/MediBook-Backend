@@ -10,6 +10,7 @@ public interface IUserRepository
     Task<List<User>> FindAllByRole(string role);
     Task<User?> FindByPhone(string phone);
     Task<List<User>> FindByFullNameContaining(string name);
+    Task<List<User>> GetAll();
     Task DeleteByUserId(int id);
 
     Task<User> Add(User user);

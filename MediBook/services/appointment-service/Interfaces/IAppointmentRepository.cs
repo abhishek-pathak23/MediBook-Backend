@@ -12,6 +12,7 @@ namespace appointment_service.Interfaces
         List<Appointment> FindByProviderIdAndAppointmentDate(int providerId, DateOnly date);
         List<Appointment> FindUpcomingByPatientId(int patientId);
         int CountByProviderId(int providerId);
+        List<Appointment> GetAll();
 
         // Standard CRUD
         void Add(Appointment appointment);

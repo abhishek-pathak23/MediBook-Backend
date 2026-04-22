@@ -70,6 +70,11 @@ public class AuthService : IAuthService
         return user;
     }
 
+    public async Task<List<User>> GetAllUsers()
+    {
+        return await _userRepository.GetAll();
+    }
+
     public async Task<User> UpdateProfile(int id, User updatedUser)
     {
         var user = await GetUserById(id);

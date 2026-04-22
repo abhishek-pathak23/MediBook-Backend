@@ -19,7 +19,7 @@ namespace appointment_service.Controllers
 
         // POST /api/v1/appointments — Book a new appointment
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Patient,Admin")]
         public async Task<IActionResult> Book([FromBody] AppointmentCreateDto dto)
         {
             // SECURITY: Get UserId from JWT claims instead of trusting the DTO (Prevents IDOR)
@@ -109,6 +109,15 @@ namespace appointment_service.Controllers
             return Ok(new { providerId, count });
         }
 
+        // GET /api/v1/appointments/all
+        [HttpGet("all")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult GetAllAppointments()
+        {
+            var appointments = _apptService.GetAllAppointments();
+            return Ok(appointments);
+        }
+
         // PUT /api/v1/appointments/{id}/cancel
         [HttpPut("{id}/cancel")]
         [Authorize]
@@ -151,7 +160,7 @@ namespace appointment_service.Controllers
 
         // PUT /api/v1/appointments/{id}/complete
         [HttpPut("{id}/complete")]
-        [Authorize]
+        [Authorize(Roles = "Provider,Admin")]
         public IActionResult Complete(int id)
         {
             try
@@ -171,7 +180,7 @@ namespace appointment_service.Controllers
 
         // PUT /api/v1/appointments/{id}/status
         [HttpPut("{id}/status")]
-        [Authorize]
+        [Authorize(Roles = "Provider,Admin")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] AppointmentStatusUpdateDto dto)
         {
             try

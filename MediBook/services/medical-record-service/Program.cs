@@ -1,13 +1,12 @@
-using appointment_service.Data;
-using appointment_service.Interfaces;
-using appointment_service.Middleware;
-using appointment_service.Repositories;
-using appointment_service.Services;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
+using medical_record_service.Data;
+using medical_record_service.Interfaces;
+using medical_record_service.Repositories;
+using medical_record_service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,14 +15,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MediBook Appointment API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MediBook Medical Record API", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer 12345abcdef'",
-        Name        = "Authorization",
-        In          = ParameterLocation.Header,
-        Type        = SecuritySchemeType.ApiKey,
-        Scheme      = "Bearer"
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
@@ -33,11 +32,11 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id   = "Bearer"
+                    Id = "Bearer"
                 },
                 Scheme = "oauth2",
-                Name   = "Bearer",
-                In     = ParameterLocation.Header
+                Name = "Bearer",
+                In = ParameterLocation.Header
             },
             new List<string>()
         }
@@ -48,31 +47,13 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Typed HTTP client — IHttpClientFactory registered under IScheduleService
-builder.Services.AddHttpClient<IScheduleService, ScheduleHttpService>(client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:ScheduleService"]
-        ?? "http://localhost:5298/");
-});
-
-// Typed HTTP client — IHttpClientFactory registered under IPaymentService
-builder.Services.AddHttpClient<IPaymentService, PaymentHttpService>(client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:PaymentService"]
-        ?? "http://localhost:5004/");
-});
-
-// Typed HTTP client — IHttpClientFactory registered under INotificationService
-builder.Services.AddHttpClient<INotificationService, NotificationHttpService>(client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:NotificationService"]
-        ?? "http://localhost:5006/");
-});
-
 // Dependency Injection
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
-builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddSingleton<EncryptionService>();
+builder.Services.AddScoped<IRecordRepository, RecordRepository>();
+builder.Services.AddScoped<IRecordService, RecordService>();
+
+// Background Service for Follow-Up Reminders
+builder.Services.AddHostedService<FollowUpReminderService>();
 
 // CORS
 builder.Services.AddCors(options =>
@@ -85,7 +66,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// JWT Authentication — mirrors auth-service configuration exactly
+// Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key missing");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -101,12 +82,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -114,7 +95,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
-
 app.UseAuthentication();
 app.UseAuthorization();
 

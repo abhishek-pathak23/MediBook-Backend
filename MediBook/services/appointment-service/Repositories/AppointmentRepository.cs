@@ -72,5 +72,11 @@ namespace appointment_service.Repositories
 
         public int CountByProviderId(int providerId) =>
             _context.Appointments.Count(a => a.ProviderId == providerId);
+
+        public List<Appointment> GetAll() =>
+            _context.Appointments
+                .OrderByDescending(a => a.AppointmentDate)
+                .ThenBy(a => a.StartTime)
+                .ToList();
     }
 }
