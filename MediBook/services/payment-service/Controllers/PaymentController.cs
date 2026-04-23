@@ -49,6 +49,60 @@ namespace payment_service.Controllers
             }
         }
 
+        public class RazorpayCreateOrderRequest
+        {
+            public int AppointmentId { get; set; }
+        }
+
+        [HttpPost("razorpay/create-order")]
+        public async Task<IActionResult> CreateRazorpayOrder([FromBody] RazorpayCreateOrderRequest request)
+        {
+            try
+            {
+                string orderId = await _paymentService.CreateRazorpayOrderAsync(request.AppointmentId);
+                return Ok(new { razorpayOrderId = orderId });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        public class RazorpayVerifyRequest
+        {
+            public int AppointmentId { get; set; }
+            public string RazorpayOrderId { get; set; } = string.Empty;
+            public string RazorpayPaymentId { get; set; } = string.Empty;
+            public string RazorpaySignature { get; set; } = string.Empty;
+        }
+
+        [HttpPost("razorpay/verify")]
+        public async Task<IActionResult> VerifyRazorpayPayment([FromBody] RazorpayVerifyRequest request)
+        {
+            try
+            {
+                var payment = await _paymentService.VerifyRazorpayPaymentAsync(
+                    request.AppointmentId, 
+                    request.RazorpayOrderId, 
+                    request.RazorpayPaymentId, 
+                    request.RazorpaySignature);
+
+                return Ok(new { message = "Payment successful", payment });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("appointment/{appointmentId}")]
         public IActionResult GetByAppointment(int appointmentId)
         {

@@ -6,6 +6,8 @@ namespace payment_service.Interfaces
     {
         Task<Payment> ProcessPaymentAsync(Payment payment);
         Payment ProcessPayment(Payment payment);
+        Task<string> CreateRazorpayOrderAsync(int appointmentId);
+        Task<Payment> VerifyRazorpayPaymentAsync(int appointmentId, string razorpayOrderId, string razorpayPaymentId, string razorpaySignature);
         Payment? GetPaymentByAppointment(int appointmentId);
         List<Payment> GetPaymentsByPatient(int patientId);
         List<Payment> GetPaymentHistory();

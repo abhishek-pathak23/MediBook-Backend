@@ -11,15 +11,18 @@ namespace payment_service.Services
         private readonly IPaymentRepository _repo;
         private readonly IAppointmentHttpService _apptHttpService;
         private readonly ILogger<PaymentService> _logger;
+        private readonly IConfiguration _config;
 
         public PaymentService(
             IPaymentRepository repo, 
             IAppointmentHttpService apptHttpService,
-            ILogger<PaymentService> logger)
+            ILogger<PaymentService> logger,
+            IConfiguration config)
         {
             _repo = repo;
             _apptHttpService = apptHttpService;
             _logger = logger;
+            _config = config;
             
             // QuestPDF requires setting the license even for Community use
             QuestPDF.Settings.License = LicenseType.Community;
@@ -60,6 +63,90 @@ namespace payment_service.Services
 
             // Notify Appointment Service that payment is complete
             await _apptHttpService.UpdateAppointmentStatusAsync(payment.AppointmentId, "Completed");
+
+            return payment;
+        }
+
+        public async Task<string> CreateRazorpayOrderAsync(int appointmentId)
+        {
+            _logger.LogInformation("Creating Razorpay Order for AppointmentId: {AppointmentId}", appointmentId);
+
+            var existing = _repo.FindByAppointmentId(appointmentId);
+            if (existing != null && (existing.Status == "Paid" || existing.Status == "Pending"))
+            {
+                throw new InvalidOperationException($"A payment session for Appointment {appointmentId} is already in progress or completed.");
+            }
+
+            var appt = await _apptHttpService.GetAppointmentDetailsAsync(appointmentId);
+            if (appt == null)
+            {
+                throw new KeyNotFoundException($"Appointment {appointmentId} not found in the booking system.");
+            }
+
+            decimal amount = CalculateAmount(appt.ServiceType);
+            
+            // Initialize Razorpay Client
+            string keyId = _config["Razorpay:KeyId"] ?? throw new InvalidOperationException("Razorpay KeyId is missing");
+            string keySecret = _config["Razorpay:KeySecret"] ?? throw new InvalidOperationException("Razorpay KeySecret is missing");
+            var client = new Razorpay.Api.RazorpayClient(keyId, keySecret);
+
+            // Create Order
+            var options = new Dictionary<string, object>
+            {
+                { "amount", (int)(amount * 100) }, // Amount in paise
+                { "currency", "INR" },
+                { "receipt", $"rcpt_appt_{appointmentId}" }
+            };
+
+            Razorpay.Api.Order order = client.Order.Create(options);
+            return order["id"].ToString();
+        }
+
+        public async Task<Payment> VerifyRazorpayPaymentAsync(int appointmentId, string razorpayOrderId, string razorpayPaymentId, string razorpaySignature)
+        {
+            _logger.LogInformation("Verifying Razorpay Payment for AppointmentId: {AppointmentId}", appointmentId);
+
+            string keySecret = _config["Razorpay:KeySecret"] ?? throw new InvalidOperationException("Razorpay KeySecret is missing");
+
+            // Verify Signature
+            var attributes = new Dictionary<string, string>
+            {
+                { "razorpay_order_id", razorpayOrderId },
+                { "razorpay_payment_id", razorpayPaymentId },
+                { "razorpay_signature", razorpaySignature }
+            };
+
+            try
+            {
+                Razorpay.Api.Utils.verifyPaymentSignature(attributes);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Payment signature verification failed.", ex);
+            }
+
+            // Signature valid, proceed to save payment
+            var appt = await _apptHttpService.GetAppointmentDetailsAsync(appointmentId);
+            if (appt == null) throw new KeyNotFoundException($"Appointment {appointmentId} not found.");
+
+            var payment = new Payment
+            {
+                AppointmentId = appointmentId,
+                PatientId = appt.PatientId,
+                ProviderId = appt.ProviderId,
+                Amount = CalculateAmount(appt.ServiceType),
+                Currency = "INR",
+                Mode = "Razorpay",
+                Status = "Paid",
+                TransactionId = razorpayPaymentId,
+                PaidAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _repo.Add(payment);
+            _repo.SaveChanges();
+
+            await _apptHttpService.UpdateAppointmentStatusAsync(appointmentId, "Completed");
 
             return payment;
         }
