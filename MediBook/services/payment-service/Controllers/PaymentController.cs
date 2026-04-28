@@ -147,6 +147,33 @@ namespace payment_service.Controllers
             }
         }
 
+        /// <summary>
+        /// Internal-only refund endpoint for service-to-service calls.
+        /// Secured via X-Internal-Service-Key header.
+        /// </summary>
+        [HttpPost("internal/refund/{appointmentId}")]
+        [AllowAnonymous]
+        public IActionResult InternalRefund(int appointmentId)
+        {
+            const string expectedKey = "medibook-internal-service-key-2024";
+            if (!Request.Headers.TryGetValue("X-Internal-Service-Key", out var key) || key != expectedKey)
+                return StatusCode(403, new { message = "Invalid or missing internal service key." });
+
+            try
+            {
+                var payment = _paymentService.GetPaymentByAppointment(appointmentId);
+                if (payment == null)
+                    return NotFound(new { message = "Payment record not found for this appointment." });
+
+                var refundedPayment = _paymentService.RefundPayment(payment.PaymentId);
+                return Ok(refundedPayment);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("status/{appointmentId}")]
         public IActionResult GetStatus(int appointmentId)
         {

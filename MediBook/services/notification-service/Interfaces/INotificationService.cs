@@ -7,6 +7,7 @@ namespace notification_service.Interfaces
     {
         Task Send(Notification notification);
         Task SendBulk(List<int> recipientIds, Notification notificationTemplate);
+        Task BroadcastDashboardEventAsync(string eventType, int? targetUserId = null, bool broadcastToAdmins = false);
         void MarkAsRead(int notificationId);
         void MarkAllRead(int recipientId);
         List<NotificationResponseDto> GetByRecipient(int recipientId);

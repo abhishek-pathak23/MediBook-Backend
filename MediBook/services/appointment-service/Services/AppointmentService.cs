@@ -13,7 +13,7 @@ namespace appointment_service.Services
         private static readonly HashSet<string> ValidStatuses =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                "Scheduled", "Completed", "Cancelled", "No-Show"
+                "Scheduled", "Confirmed", "Completed", "Cancelled", "No-Show"
             };
 
         public AppointmentService(
@@ -83,14 +83,14 @@ namespace appointment_service.Services
             // Notify schedule-service to mark slot as booked
             await _schedSvc.BookSlotAsync(appointment.SlotId);
 
-            // Send Booking Confirmation
+            // Send Booking Confirmation + broadcast dashboard event
             try
             {
                 await _notificationSvc.SendBookingConfirmationAsync(appointment.PatientId, appointment.ProviderId, appointment.AppointmentId);
+                await _notificationSvc.BroadcastDashboardEventAsync("NewAppointment", targetUserId: appointment.ProviderId, broadcastToAdmins: true);
             }
             catch (Exception ex)
             {
-                // Log and swallow so the booking doesn't fail if notification fails
                 Console.WriteLine($"Warning: Failed to send booking notification. {ex.Message}");
             }
 
@@ -137,14 +137,14 @@ namespace appointment_service.Services
             // Trigger refund via payment-service (stub for now)
             await _paySvc.TriggerRefundAsync(appt.AppointmentId);
 
-            // Send Cancellation Alert
+            // Send Cancellation Alert + broadcast dashboard event
             try
             {
                 await _notificationSvc.SendCancellationAlertAsync(appt.PatientId, appt.ProviderId, appt.AppointmentId);
+                await _notificationSvc.BroadcastDashboardEventAsync("AppointmentStatusChanged", targetUserId: appt.PatientId, broadcastToAdmins: true);
             }
             catch (Exception ex)
             {
-                // Log and swallow so the cancellation doesn't fail if notification fails
                 Console.WriteLine($"Warning: Failed to send cancellation notification. {ex.Message}");
             }
         }
@@ -207,9 +207,9 @@ namespace appointment_service.Services
         {
             var appt = _repo.GetById(id) ?? throw new KeyNotFoundException("Appointment not found.");
 
-            if (appt.Status != "Scheduled")
+            if (appt.Status != "Scheduled" && appt.Status != "Confirmed")
                 throw new InvalidOperationException(
-                    $"Only 'Scheduled' appointments can be marked complete. Current status: {appt.Status}.");
+                    $"Only 'Scheduled' or 'Confirmed' appointments can be marked complete. Current status: {appt.Status}.");
 
             appt.SetStatus("Completed");
             appt.UpdatedAt = DateTime.UtcNow;
@@ -232,6 +232,10 @@ namespace appointment_service.Services
             _repo.Update(appt);
             _repo.SaveChanges();
 
+            // Broadcast status change to patient and admins
+            try { await _notificationSvc.BroadcastDashboardEventAsync("AppointmentStatusChanged", targetUserId: appt.PatientId, broadcastToAdmins: true); }
+            catch { /* non-critical */ }
+
             return appt.Status;
         }
 
@@ -240,6 +244,9 @@ namespace appointment_service.Services
 
         public List<Appointment> GetUpcomingByPatient(int patientId) =>
             _repo.FindUpcomingByPatientId(patientId);
+
+        public List<Appointment> GetUpcomingByProvider(int providerId) =>
+            _repo.FindUpcomingByProviderId(providerId);
 
         public int GetAppointmentCount(int providerId) =>
             _repo.CountByProviderId(providerId);

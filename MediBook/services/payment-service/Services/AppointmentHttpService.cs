@@ -54,10 +54,11 @@ namespace payment_service.Services
         {
             _logger.LogInformation("Updating Appointment {Id} status to {Status}", appointmentId, status);
             
-            AddAuthorizationHeader();
+            var request = new HttpRequestMessage(HttpMethod.Put, $"/api/v1/appointments/internal/{appointmentId}/status");
+            request.Headers.Add("X-Internal-Service-Key", "MediBookInternalSync");
+            request.Content = JsonContent.Create(new { status });
 
-            var content = JsonContent.Create(new { status });
-            var response = await _httpClient.PutAsync($"/api/v1/appointments/{appointmentId}/status", content);
+            var response = await _httpClient.SendAsync(request);
 
             return response.IsSuccessStatusCode;
         }

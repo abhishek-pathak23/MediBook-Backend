@@ -82,6 +82,15 @@ namespace appointment_service.Controllers
             return Ok(appointments);
         }
 
+        // GET /api/v1/appointments/provider/{providerId}/upcoming
+        [HttpGet("provider/{providerId}/upcoming")]
+        [Authorize]
+        public IActionResult GetUpcomingByProvider(int providerId)
+        {
+            var appointments = _apptService.GetUpcomingByProvider(providerId);
+            return Ok(appointments);
+        }
+
         // GET /api/v1/appointments/provider/{providerId}
         [HttpGet("provider/{providerId}")]
         [Authorize]
@@ -183,6 +192,31 @@ namespace appointment_service.Controllers
         [Authorize(Roles = "Provider,Admin")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] AppointmentStatusUpdateDto dto)
         {
+            try
+            {
+                var newStatus = await _apptService.UpdateStatusAsync(id, dto.Status);
+                return Ok(new { id, status = newStatus });
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // PUT /api/v1/appointments/internal/{id}/status
+        [HttpPut("internal/{id}/status")]
+        public async Task<IActionResult> UpdateStatusInternal(int id, [FromBody] AppointmentStatusUpdateDto dto)
+        {
+            // Internal Service-to-Service Security Check
+            if (!Request.Headers.TryGetValue("X-Internal-Service-Key", out var apiKey) || apiKey != "MediBookInternalSync")
+            {
+                return Unauthorized(new { message = "Invalid Internal Service Key" });
+            }
+
             try
             {
                 var newStatus = await _apptService.UpdateStatusAsync(id, dto.Status);

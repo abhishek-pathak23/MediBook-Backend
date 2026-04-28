@@ -1,18 +1,17 @@
 using appointment_service.Interfaces;
-using System.Net.Http.Headers;
 
 namespace appointment_service.Services
 {
     /// <summary>
     /// Communicates with the Payment-Service via IHttpClientFactory.
-    /// Calls POST /api/v1/payments/refund/{appointmentId} to trigger a refund
+    /// Calls POST /api/v1/payments/internal/refund/{appointmentId} to trigger a refund
     /// when an appointment is cancelled.
     /// </summary>
     public class PaymentHttpService : IPaymentService
     {
         private readonly HttpClient _httpClient;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<PaymentHttpService> _logger;
+        private const string InternalServiceKey = "medibook-internal-service-key-2024";
 
         public PaymentHttpService(
             HttpClient httpClient,
@@ -20,7 +19,6 @@ namespace appointment_service.Services
             ILogger<PaymentHttpService> logger)
         {
             _httpClient = httpClient;
-            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
 
@@ -30,12 +28,12 @@ namespace appointment_service.Services
                 "Triggering refund via Payment-Service for AppointmentId={AppointmentId}",
                 appointmentId);
 
-            PropagateAuthorizationHeader();
+            SetInternalKey();
 
             try
             {
                 var response = await _httpClient.PostAsync(
-                    $"api/v1/payments/refund/{appointmentId}", null);
+                    $"api/v1/payments/internal/refund/{appointmentId}", null);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -49,28 +47,23 @@ namespace appointment_service.Services
                     _logger.LogWarning(
                         "Payment-Service refund returned {StatusCode} for AppointmentId={AppointmentId}. Detail: {Error}",
                         response.StatusCode, appointmentId, error);
-                    // Non-critical: log but don't throw — appointment cancellation should still succeed
-                    // The refund can be retried manually via Payment-Service
                 }
             }
             catch (HttpRequestException ex)
             {
-                // Payment-Service might be down — log but don't block the cancellation
                 _logger.LogError(ex,
                     "Failed to connect to Payment-Service for refund. AppointmentId={AppointmentId}",
                     appointmentId);
             }
         }
 
-        private void PropagateAuthorizationHeader()
+        private void SetInternalKey()
         {
-            var context = _httpContextAccessor.HttpContext;
-            if (context != null && context.Request.Headers.TryGetValue("Authorization", out var authHeader))
+            if (!_httpClient.DefaultRequestHeaders.Contains("X-Internal-Service-Key"))
             {
-                var token = authHeader.ToString().Replace("Bearer ", "");
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
+                _httpClient.DefaultRequestHeaders.Add("X-Internal-Service-Key", InternalServiceKey);
             }
         }
     }
 }
+

@@ -32,4 +32,11 @@ namespace notification_service.DTOs
         public string Message { get; set; } = string.Empty;
         public string Channel { get; set; } = string.Empty;
     }
+
+    public class DashboardEventDto
+    {
+        public string EventType { get; set; } = string.Empty;
+        public int? TargetUserId { get; set; }
+        public bool BroadcastToAdmins { get; set; }
+    }
 }

@@ -13,6 +13,7 @@ public class RegisterRequestDto
     [Phone]
     public string? Phone { get; set; }
     public string? ProfilePicUrl { get; set; }
+    public string? Role { get; set; }
 }
 
 /// <summary>
@@ -28,6 +29,7 @@ public class UserProfileDto
     public string? Provider { get; set; }
     public string? ProfilePicUrl { get; set; }
     public DateTime CreatedAt { get; set; }
+    public bool IsActive { get; set; }
 }
 
 public class LoginRequestDto

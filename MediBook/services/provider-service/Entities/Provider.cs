@@ -23,6 +23,7 @@ namespace provider_service.Entities
         public double AvgRating { get; set; }
         public bool IsVerified { get; set; }
         public bool IsAvailable { get; set; }
+        public bool IsActive { get; set; } = true;
         public DateOnly CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
     }
 }

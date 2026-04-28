@@ -52,8 +52,17 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 
-// Typed HTTP Client
+// Typed HTTP Clients
 builder.Services.AddHttpClient<IAppointmentHttpService, AppointmentHttpService>();
+builder.Services.AddHttpClient<IProviderHttpService, ProviderHttpService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:ProviderService"]
+        ?? "http://localhost:5117/");
+});
+builder.Services.AddHttpClient<INotificationHttpService, NotificationHttpService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:NotificationService"] ?? "http://localhost:5006/");
+});
 
 // CORS
 builder.Services.AddCors(options =>

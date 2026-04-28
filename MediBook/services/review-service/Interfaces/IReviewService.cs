@@ -10,7 +10,7 @@ namespace review_service.Interfaces
         List<ReviewResponseDto> GetByPatient(int patientId);
         ReviewResponseDto? GetByAppointment(int appointmentId);
         Task<Review> UpdateReviewAsync(int id, Review review);
-        void DeleteReview(int id);
+        Task DeleteReviewAsync(int id);
         double GetAvgRating(int providerId);
         int GetReviewCount(int providerId);
         List<ReviewResponseDto> GetAllReviews();

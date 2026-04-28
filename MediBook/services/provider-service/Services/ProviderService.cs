@@ -59,9 +59,13 @@ namespace provider_service.Services
 
         public IEnumerable<Provider> SearchProviders(string query)
         {
+            IEnumerable<Provider> results;
             if (string.IsNullOrWhiteSpace(query))
-                return _repo.GetAllProviders();
-            return _repo.SearchByNameOrSpecialization(query);
+                results = _repo.GetAllProviders();
+            else
+                results = _repo.SearchByNameOrSpecialization(query);
+            
+            return results.Where(p => p.IsActive);
         }
 
         public void SetAvailability(int id, bool isAvailable)
@@ -103,6 +107,15 @@ namespace provider_service.Services
             if (provider == null) throw new Exception("Provider not found");
 
             provider.IsVerified = true;
+            _repo.Update(provider);
+        }
+
+        public void SetProviderActiveStatus(int id, bool isActive)
+        {
+            var provider = _repo.GetProviderById(id);
+            if (provider == null) throw new Exception("Provider not found");
+
+            provider.IsActive = isActive;
             _repo.Update(provider);
         }
     }

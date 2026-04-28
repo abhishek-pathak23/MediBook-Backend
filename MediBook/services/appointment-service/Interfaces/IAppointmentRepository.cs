@@ -11,6 +11,7 @@ namespace appointment_service.Interfaces
         List<Appointment> FindByStatus(string status);
         List<Appointment> FindByProviderIdAndAppointmentDate(int providerId, DateOnly date);
         List<Appointment> FindUpcomingByPatientId(int patientId);
+        List<Appointment> FindUpcomingByProviderId(int providerId);
         int CountByProviderId(int providerId);
         List<Appointment> GetAll();
 

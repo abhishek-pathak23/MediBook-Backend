@@ -18,7 +18,7 @@ namespace provider_service.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Provider")]
         public IActionResult Register([FromBody] ProviderRegistrationDto dto)
         {
             var provider = _providerService.RegisterProvider(dto);
@@ -85,5 +85,63 @@ namespace provider_service.Controllers
             _providerService.DeleteProvider(id);
             return NoContent();
         }
+
+        /// <summary>
+        /// Internal-only endpoint for review-service to update provider's average rating.
+        /// </summary>
+        [HttpPut("{id}/rating")]
+        [AllowAnonymous]
+        public IActionResult UpdateRating(int id, [FromBody] RatingUpdateDto dto)
+        {
+            const string expectedKey = "medibook-internal-service-key-2024";
+            if (!Request.Headers.TryGetValue("X-Internal-Service-Key", out var key) || key != expectedKey)
+                return StatusCode(403, new { message = "Invalid or missing internal service key." });
+
+            try
+            {
+                _providerService.UpdateRating(id, dto.AvgRating);
+                return Ok(new { message = $"Provider {id} rating updated to {dto.AvgRating:F1}" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Internal-only endpoint for auth-service to sync user suspension status.
+        /// </summary>
+        [HttpPut("{id}/status")]
+        [AllowAnonymous]
+        public IActionResult UpdateStatus(int id, [FromBody] StatusUpdateDto dto)
+        {
+            const string expectedKey = "medibook-internal-service-key-2024";
+            if (!Request.Headers.TryGetValue("X-Internal-Service-Key", out var key) || key != expectedKey)
+                return StatusCode(403, new { message = "Invalid or missing internal service key." });
+
+            try
+            {
+                var provider = _providerService.GetProviderById(id);
+                if (provider == null) return NotFound("Provider not found");
+                
+                // Directly update the DB or use a service method. We'll use service.
+                _providerService.SetProviderActiveStatus(id, dto.IsActive);
+                return Ok(new { message = $"Provider {id} IsActive set to {dto.IsActive}" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+    }
+
+    public class RatingUpdateDto
+    {
+        public double AvgRating { get; set; }
+    }
+
+    public class StatusUpdateDto
+    {
+        public bool IsActive { get; set; }
     }
 }

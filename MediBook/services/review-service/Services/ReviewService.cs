@@ -8,11 +8,15 @@ namespace review_service.Services
     {
         private readonly IReviewRepository _repo;
         private readonly IAppointmentHttpService _appointmentSvc;
+        private readonly IProviderHttpService _providerSvc;
+        private readonly INotificationHttpService _notifSvc;
 
-        public ReviewService(IReviewRepository repo, IAppointmentHttpService appointmentSvc)
+        public ReviewService(IReviewRepository repo, IAppointmentHttpService appointmentSvc, IProviderHttpService providerSvc, INotificationHttpService notifSvc)
         {
             _repo = repo;
             _appointmentSvc = appointmentSvc;
+            _providerSvc = providerSvc;
+            _notifSvc = notifSvc;
         }
 
         public async Task<Review> AddReviewAsync(Review review)
@@ -42,6 +46,13 @@ namespace review_service.Services
 
             _repo.Add(review);
             _repo.SaveChanges();
+
+            // Push updated average rating to provider-service
+            await UpdateProviderRatingAsync(review.ProviderId);
+
+            // Broadcast real-time dashboard update to the provider
+            await _notifSvc.BroadcastDashboardEventAsync("NewReview", targetUserId: review.ProviderId, broadcastToAdmins: false);
+
             return review;
         }
 
@@ -73,13 +84,20 @@ namespace review_service.Services
 
             _repo.Update(existing);
             _repo.SaveChanges();
+            await UpdateProviderRatingAsync(existing.ProviderId);
             return existing;
         }
 
-        public void DeleteReview(int id)
+        public async Task DeleteReviewAsync(int id)
         {
-            _repo.Delete(id);
-            _repo.SaveChanges();
+            var review = _repo.GetById(id);
+            if (review != null)
+            {
+                int providerId = review.ProviderId;
+                _repo.Delete(id);
+                _repo.SaveChanges();
+                await UpdateProviderRatingAsync(providerId);
+            }
         }
 
         public double GetAvgRating(int providerId)
@@ -112,6 +130,22 @@ namespace review_service.Services
                 IsVerified = review.IsVerified,
                 IsAnonymous = review.IsAnonymous
             };
+        }
+
+        /// <summary>
+        /// Recalculates the average rating for a provider and pushes it to provider-service.
+        /// </summary>
+        private async Task UpdateProviderRatingAsync(int providerId)
+        {
+            try
+            {
+                var avgRating = _repo.GetAverageRating(providerId);
+                await _providerSvc.UpdateProviderRatingAsync(providerId, avgRating);
+            }
+            catch (Exception)
+            {
+                // Non-critical: don't fail the review operation if rating sync fails
+            }
         }
     }
 }

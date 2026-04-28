@@ -100,9 +100,9 @@ namespace review_service.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public IActionResult DeleteReview(int id)
+        public async Task<IActionResult> DeleteReview(int id)
         {
-            _reviewService.DeleteReview(id);
+            await _reviewService.DeleteReviewAsync(id);
             return NoContent();
         }
 

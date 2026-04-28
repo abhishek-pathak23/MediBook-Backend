@@ -28,6 +28,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpClient();
 
 // 2. Configure JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key missing");
@@ -86,6 +87,9 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+// 3.5 Seed Database
+DbSeeder.SeedAdminUser(app.Services);
 
 // 4. Configure the HTTP request pipeline
 app.UseMiddleware<ExceptionHandlingMiddleware>();

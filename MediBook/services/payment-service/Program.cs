@@ -46,6 +46,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Dependency Injection
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient<IAppointmentHttpService, AppointmentHttpService>();
+builder.Services.AddHttpClient<INotificationHttpService, NotificationHttpService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:NotificationService"] ?? "http://localhost:5006/");
+});
 
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();

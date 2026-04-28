@@ -64,7 +64,19 @@ namespace appointment_service.Repositories
             return _context.Appointments
                 .Where(a => a.PatientId == patientId
                          && a.AppointmentDate >= today
-                         && a.Status == "Scheduled")
+                         && (a.Status == "Scheduled" || a.Status == "Confirmed"))
+                .OrderBy(a => a.AppointmentDate)
+                .ThenBy(a => a.StartTime)
+                .ToList();
+        }
+
+        public List<Appointment> FindUpcomingByProviderId(int providerId)
+        {
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            return _context.Appointments
+                .Where(a => a.ProviderId == providerId
+                         && a.AppointmentDate >= today
+                         && (a.Status == "Scheduled" || a.Status == "Confirmed"))
                 .OrderBy(a => a.AppointmentDate)
                 .ThenBy(a => a.StartTime)
                 .ToList();

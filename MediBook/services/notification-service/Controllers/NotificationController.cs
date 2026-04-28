@@ -39,6 +39,49 @@ namespace notification_service.Controllers
             return StatusCode(201, new { message = "Notification sent successfully." });
         }
 
+        /// <summary>
+        /// Internal-only endpoint for service-to-service notification creation.
+        /// Secured via X-Internal-Service-Key header instead of JWT.
+        /// </summary>
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> InternalSend([FromBody] NotificationCreateDto dto)
+        {
+            const string expectedKey = "medibook-internal-service-key-2024";
+            if (!Request.Headers.TryGetValue("X-Internal-Service-Key", out var key) || key != expectedKey)
+                return StatusCode(403, new { message = "Invalid or missing internal service key." });
+
+            var notif = new Notification
+            {
+                RecipientId = dto.RecipientId,
+                Type = dto.Type,
+                Title = dto.Title,
+                Message = dto.Message,
+                Channel = dto.Channel,
+                RelatedId = dto.RelatedId,
+                RelatedType = dto.RelatedType
+            };
+
+            await _notifService.Send(notif);
+            return StatusCode(201, new { message = "Notification sent successfully." });
+        }
+
+        /// <summary>
+        /// Internal-only endpoint for service-to-service SignalR dashboard pushes.
+        /// </summary>
+        [HttpPost("broadcast-event")]
+        [AllowAnonymous]
+        public async Task<IActionResult> BroadcastEvent([FromBody] DashboardEventDto dto)
+        {
+            const string expectedKey = "medibook-internal-service-key-2024";
+            if (!Request.Headers.TryGetValue("X-Internal-Service-Key", out var key) || key != expectedKey)
+                return StatusCode(403, new { message = "Invalid or missing internal service key." });
+
+            await _notifService.BroadcastDashboardEventAsync(dto.EventType, dto.TargetUserId, dto.BroadcastToAdmins);
+            return Ok(new { message = $"Event '{dto.EventType}' broadcasted." });
+        }
+
+
         [HttpPost("send/bulk")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> SendBulk([FromBody] BulkNotificationDto dto)

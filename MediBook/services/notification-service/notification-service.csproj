@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>notification_service</RootNamespace>
+  <UseAppHost>false</UseAppHost>
+  <AssemblyName>MyNotifSvc3</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

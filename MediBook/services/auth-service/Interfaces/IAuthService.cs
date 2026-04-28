@@ -13,6 +13,7 @@ public interface IAuthService
     Task<User> GetUserById(int id);
     Task<List<User>> GetAllUsers();
     Task<User> UpdateProfile(int id, User user);
-    Task ChangePassword(int id, string newPassword);
+    Task ChangePassword(int id, string oldPassword, string newPassword);
     Task DeactivateAccount(int id);
+    Task<User> ToggleUserStatus(int id);
 }

@@ -25,7 +25,8 @@ public class AuthController : ControllerBase
             FullName = request.FullName,
             Email = request.Email,
             Phone = request.Phone,
-            Role = "Patient", // SECURITY: Force all public registrations to Patient role
+            // SECURITY FIX: Public registration can only ever be Patient or Provider
+            Role = !string.IsNullOrEmpty(request.Role) && request.Role == "Provider" ? "Provider" : "Patient",
             Provider = null,   // SECURITY: Cannot self-assign a provider profile
             ProfilePicUrl = request.ProfilePicUrl
         };
@@ -45,16 +46,47 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
-        var token = await _authService.Login(request.Email, request.Password);
-        var user = await _authService.GetUserByEmail(request.Email);
-
-        return Ok(new AuthResponseDto
+        try
         {
-            Token = token,
-            UserId = user.UserId,
-            FullName = user.FullName,
-            Email = user.Email,
-            Role = user.Role
+            var token = await _authService.Login(request.Email, request.Password);
+            var user = await _authService.GetUserByEmail(request.Email);
+
+            return Ok(new AuthResponseDto
+            {
+                Token = token,
+                UserId = user.UserId,
+                FullName = user.FullName,
+                Email = user.Email,
+                Role = user.Role
+            });
+        }
+        catch (Exception ex) when (ex.Message == "Invalid credentials." || ex.Message == "Account is deactivated.")
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("create-admin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> CreateAdmin([FromBody] RegisterRequestDto request)
+    {
+        var userToCreate = new User
+        {
+            FullName = request.FullName,
+            Email = request.Email,
+            Phone = request.Phone,
+            Role = "Admin", // FORCE ADMIN ROLE
+            Provider = null,
+            ProfilePicUrl = request.ProfilePicUrl
+        };
+
+        var createdUser = await _authService.Register(userToCreate, request.Password);
+
+        return Ok(new
+        {
+            message = "Admin user created successfully.",
+            UserId = createdUser.UserId,
+            Email = createdUser.Email
         });
     }
 
@@ -111,8 +143,15 @@ public class AuthController : ControllerBase
         var userIdString = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
 
-        await _authService.ChangePassword(userId, request.NewPassword);
-        return Ok(new { message = "Password updated" });
+        try
+        {
+            await _authService.ChangePassword(userId, request.OldPassword, request.NewPassword);
+            return Ok(new { message = "Password updated successfully." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("deactivate")]
@@ -135,6 +174,14 @@ public class AuthController : ControllerBase
         return Ok(dtos);
     }
 
+    [HttpPut("users/{userId}/toggle-status")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ToggleUserStatus(int userId)
+    {
+        var updatedUser = await _authService.ToggleUserStatus(userId);
+        return Ok(ToProfileDto(updatedUser));
+    }
+
     private static UserProfileDto ToProfileDto(User user) => new UserProfileDto
     {
         UserId = user.UserId,
@@ -144,6 +191,7 @@ public class AuthController : ControllerBase
         Role = user.Role,
         Provider = user.Provider,
         ProfilePicUrl = user.ProfilePicUrl,
-        CreatedAt = user.CreatedAt
+        CreatedAt = user.CreatedAt,
+        IsActive = user.IsActive
     };
 }

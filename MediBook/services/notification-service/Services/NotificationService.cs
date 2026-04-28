@@ -81,6 +81,23 @@ namespace notification_service.Services
             }
         }
 
+        public async Task BroadcastDashboardEventAsync(string eventType, int? targetUserId = null, bool broadcastToAdmins = false)
+        {
+            _logger.LogInformation("Broadcasting dashboard event: {EventType}", eventType);
+
+            // Push to all connected admins
+            if (broadcastToAdmins)
+            {
+                await _hub.Clients.Group("admins").SendAsync("DashboardUpdate", eventType);
+            }
+
+            // Push to a specific user (e.g., provider or patient)
+            if (targetUserId.HasValue)
+            {
+                await _hub.Clients.User(targetUserId.Value.ToString()).SendAsync("DashboardUpdate", eventType);
+            }
+        }
+
         private async Task SendInApp(Notification notification)
         {
             // Using SignalR to push to the connected user. The UserId matches RecipientId.

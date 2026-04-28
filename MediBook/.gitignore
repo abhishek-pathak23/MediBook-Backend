@@ -31,11 +31,21 @@ packages/
 
 # ========================
 # Environment & Secrets
-# (appsettings.json contains JWT keys — replace with env vars in production)
+# appsettings.json contains JWT keys, DB connection strings, and API keys.
+# Use appsettings.Example.json as a template for other developers.
 # ========================
 appsettings.Local.json
 .env.local
 .env.production
+.env
+
+# ========================
+# Sensitive Config — DO NOT COMMIT
+# Each service has its own appsettings.json with real secrets.
+# Commit only appsettings.Example.json
+# ========================
+appsettings.json
+!**/appsettings.Example.json
 
 # ========================
 # OS Artifacts

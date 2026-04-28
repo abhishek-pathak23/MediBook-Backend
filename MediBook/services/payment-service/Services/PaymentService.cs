@@ -10,17 +10,20 @@ namespace payment_service.Services
     {
         private readonly IPaymentRepository _repo;
         private readonly IAppointmentHttpService _apptHttpService;
+        private readonly INotificationHttpService _notifHttpService;
         private readonly ILogger<PaymentService> _logger;
         private readonly IConfiguration _config;
 
         public PaymentService(
             IPaymentRepository repo, 
             IAppointmentHttpService apptHttpService,
+            INotificationHttpService notifHttpService,
             ILogger<PaymentService> logger,
             IConfiguration config)
         {
             _repo = repo;
             _apptHttpService = apptHttpService;
+            _notifHttpService = notifHttpService;
             _logger = logger;
             _config = config;
             
@@ -62,7 +65,10 @@ namespace payment_service.Services
             _repo.SaveChanges();
 
             // Notify Appointment Service that payment is complete
-            await _apptHttpService.UpdateAppointmentStatusAsync(payment.AppointmentId, "Completed");
+            await _apptHttpService.UpdateAppointmentStatusAsync(payment.AppointmentId, "Confirmed");
+
+            // Broadcast real-time dashboard update
+            await _notifHttpService.BroadcastDashboardEventAsync("PaymentCompleted", targetUserId: payment.PatientId, broadcastToAdmins: true);
 
             return payment;
         }
@@ -118,7 +124,17 @@ namespace payment_service.Services
 
             try
             {
-                Razorpay.Api.Utils.verifyPaymentSignature(attributes);
+                string payload = $"{razorpayOrderId}|{razorpayPaymentId}";
+                using (var hmac = new System.Security.Cryptography.HMACSHA256(System.Text.Encoding.UTF8.GetBytes(keySecret)))
+                {
+                    var hashBytes = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(payload));
+                    var generatedSignature = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                    
+                    if (generatedSignature != razorpaySignature)
+                    {
+                        throw new Exception("Signature mismatch");
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -146,7 +162,10 @@ namespace payment_service.Services
             _repo.Add(payment);
             _repo.SaveChanges();
 
-            await _apptHttpService.UpdateAppointmentStatusAsync(appointmentId, "Completed");
+            await _apptHttpService.UpdateAppointmentStatusAsync(appointmentId, "Confirmed");
+
+            // Broadcast real-time dashboard update
+            await _notifHttpService.BroadcastDashboardEventAsync("PaymentCompleted", targetUserId: payment.PatientId, broadcastToAdmins: true);
 
             return payment;
         }
@@ -159,12 +178,14 @@ namespace payment_service.Services
 
         private decimal CalculateAmount(string serviceType)
         {
+            if (string.IsNullOrEmpty(serviceType)) return 800; // Default base fee
+
             // Simple Pricing Engine Mock
             return serviceType.ToLower() switch
             {
-                "general" or "consultation" => 500,
-                "specialist" or "cardiologist" or "neurologist" => 1500,
-                "emergency" => 2500,
+                "general consultation" => 500,
+                "specialist consultation" => 1500,
+                "emergency visit" => 2500,
                 _ => 800 // Default base fee
             };
         }

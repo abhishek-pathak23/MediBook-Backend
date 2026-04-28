@@ -15,5 +15,6 @@ namespace provider_service.Interfaces
         void DeleteProvider(int id);
         void UpdateRating(int id, double newRating);
         IEnumerable<Provider> GetAllProviders();
+        void SetProviderActiveStatus(int id, bool isActive);
     }
 }
