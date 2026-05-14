@@ -1,0 +1,62 @@
+# ========================
+# .NET Build Artifacts
+# ========================
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+
+# ========================
+# Visual Studio / Rider IDE
+# ========================
+.vs/
+.vscode/
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+.idea/
+
+# ========================
+# NuGet
+# ========================
+*.nupkg
+*.snupkg
+project.lock.json
+packages/
+!**/packages/repositories.config
+
+# ========================
+# Environment & Secrets
+# appsettings.json contains JWT keys, DB connection strings, and API keys.
+# Use appsettings.Example.json as a template for other developers.
+# ========================
+appsettings.Local.json
+.env.local
+.env.production
+.env
+
+# ========================
+# Sensitive Config — DO NOT COMMIT
+# Each service has its own appsettings.json with real secrets.
+# Commit only appsettings.Example.json
+# ========================
+appsettings.json
+!**/appsettings.Example.json
+
+# ========================
+# OS Artifacts
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# Test Results
+# ========================
+TestResults/
+*.trx
+*.coverage

@@ -1,0 +1,112 @@
+databases:
+  - name: medibook-db
+    databaseName: medibook
+    user: medibook_user
+    plan: free
+
+services:
+  - type: web
+    name: auth-service
+    env: docker
+    plan: free
+    rootDir: MediBook/services/auth-service
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: medibook-db
+          property: connectionString
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: JwtSettings__SecretKey
+        generateValue: true
+
+  - type: web
+    name: appointment-service
+    env: docker
+    plan: free
+    rootDir: MediBook/services/appointment-service
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: medibook-db
+          property: connectionString
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+
+  - type: web
+    name: medical-record-service
+    env: docker
+    plan: free
+    rootDir: MediBook/services/medical-record-service
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: medibook-db
+          property: connectionString
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+
+  - type: web
+    name: notification-service
+    env: docker
+    plan: free
+    rootDir: MediBook/services/notification-service
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: medibook-db
+          property: connectionString
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+
+  - type: web
+    name: payment-service
+    env: docker
+    plan: free
+    rootDir: MediBook/services/payment-service
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: medibook-db
+          property: connectionString
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+
+  - type: web
+    name: provider-service
+    env: docker
+    plan: free
+    rootDir: MediBook/services/provider-service
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: medibook-db
+          property: connectionString
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+
+  - type: web
+    name: review-service
+    env: docker
+    plan: free
+    rootDir: MediBook/services/review-service
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: medibook-db
+          property: connectionString
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+
+  - type: web
+    name: schedule-service
+    env: docker
+    plan: free
+    rootDir: MediBook/services/schedule-service
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: medibook-db
+          property: connectionString
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production

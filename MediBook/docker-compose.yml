@@ -1,0 +1,3 @@
+version: '3.8'
+services:
+  # Define backend services here, e.g. auth-service, provider-service, etc.
