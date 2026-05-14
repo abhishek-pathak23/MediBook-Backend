@@ -6,9 +6,9 @@ services:
     rootDir: MediBook/services/auth-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        sync: false
+        value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
-        sync: false
+        value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -19,9 +19,9 @@ services:
     rootDir: MediBook/services/appointment-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        sync: false
+        value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
-        sync: false
+        value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -32,9 +32,9 @@ services:
     rootDir: MediBook/services/medical-record-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        sync: false
+        value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
-        sync: false
+        value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -45,9 +45,9 @@ services:
     rootDir: MediBook/services/notification-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        sync: false
+        value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
-        sync: false
+        value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -58,9 +58,9 @@ services:
     rootDir: MediBook/services/payment-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        sync: false
+        value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
-        sync: false
+        value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -71,9 +71,9 @@ services:
     rootDir: MediBook/services/provider-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        sync: false
+        value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
-        sync: false
+        value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -84,9 +84,9 @@ services:
     rootDir: MediBook/services/review-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        sync: false
+        value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
-        sync: false
+        value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -97,9 +97,9 @@ services:
     rootDir: MediBook/services/schedule-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        sync: false
+        value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
-        sync: false
+        value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -110,8 +110,8 @@ services:
     rootDir: MediBook/services/api-gateway
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        sync: false
+        value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
-        sync: false
+        value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
