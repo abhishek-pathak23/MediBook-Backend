@@ -1,5 +1,9 @@
-envVarGroups:
-  - name: shared-config
+services:
+  - type: web
+    name: auth-service
+    env: docker
+    plan: free
+    rootDir: MediBook/services/auth-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
         sync: false
@@ -8,75 +12,106 @@ envVarGroups:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
-services:
-  - type: web
-    name: auth-service
-    env: docker
-    plan: free
-    rootDir: MediBook/services/auth-service
-    envVarGroups:
-      - shared-config
-
   - type: web
     name: appointment-service
     env: docker
     plan: free
     rootDir: MediBook/services/appointment-service
-    envVarGroups:
-      - shared-config
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
 
   - type: web
     name: medical-record-service
     env: docker
     plan: free
     rootDir: MediBook/services/medical-record-service
-    envVarGroups:
-      - shared-config
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
 
   - type: web
     name: notification-service
     env: docker
     plan: free
     rootDir: MediBook/services/notification-service
-    envVarGroups:
-      - shared-config
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
 
   - type: web
     name: payment-service
     env: docker
     plan: free
     rootDir: MediBook/services/payment-service
-    envVarGroups:
-      - shared-config
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
 
   - type: web
     name: provider-service
     env: docker
     plan: free
     rootDir: MediBook/services/provider-service
-    envVarGroups:
-      - shared-config
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
 
   - type: web
     name: review-service
     env: docker
     plan: free
     rootDir: MediBook/services/review-service
-    envVarGroups:
-      - shared-config
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
 
   - type: web
     name: schedule-service
     env: docker
     plan: free
     rootDir: MediBook/services/schedule-service
-    envVarGroups:
-      - shared-config
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
 
   - type: web
     name: api-gateway
     env: docker
     plan: free
     rootDir: MediBook/services/api-gateway
-    envVarGroups:
-      - shared-config
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
