@@ -173,6 +173,10 @@ services:
         value: "https://notification-service-o9q0.onrender.com/"
       - key: ServiceUrls__MedicalRecordService
         value: "https://medical-record-service.onrender.com/"
+      - key: Razorpay__KeyId
+        value: "rzp_test_SpLPl9V9sZ4UZJ"
+      - key: Razorpay__KeySecret
+        value: "FJ4KJji6KR6I0RSaOTttBhdw"
 
   - type: web
     name: provider-service
