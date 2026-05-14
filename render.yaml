@@ -9,6 +9,10 @@ services:
         value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
+      - key: Jwt__Issuer
+        value: "MediBookAuthService"
+      - key: Jwt__Audience
+        value: "MediBookNetwork"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ServiceUrls__ApiGateway
@@ -40,6 +44,10 @@ services:
         value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
+      - key: Jwt__Issuer
+        value: "MediBookAuthService"
+      - key: Jwt__Audience
+        value: "MediBookNetwork"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ServiceUrls__ApiGateway
@@ -71,6 +79,10 @@ services:
         value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
+      - key: Jwt__Issuer
+        value: "MediBookAuthService"
+      - key: Jwt__Audience
+        value: "MediBookNetwork"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ServiceUrls__ApiGateway
@@ -102,6 +114,10 @@ services:
         value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
+      - key: Jwt__Issuer
+        value: "MediBookAuthService"
+      - key: Jwt__Audience
+        value: "MediBookNetwork"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ServiceUrls__ApiGateway
@@ -133,6 +149,10 @@ services:
         value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
+      - key: Jwt__Issuer
+        value: "MediBookAuthService"
+      - key: Jwt__Audience
+        value: "MediBookNetwork"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ServiceUrls__ApiGateway
@@ -164,6 +184,10 @@ services:
         value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
+      - key: Jwt__Issuer
+        value: "MediBookAuthService"
+      - key: Jwt__Audience
+        value: "MediBookNetwork"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ServiceUrls__ApiGateway
@@ -195,6 +219,10 @@ services:
         value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
+      - key: Jwt__Issuer
+        value: "MediBookAuthService"
+      - key: Jwt__Audience
+        value: "MediBookNetwork"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ServiceUrls__ApiGateway
@@ -226,6 +254,10 @@ services:
         value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
+      - key: Jwt__Issuer
+        value: "MediBookAuthService"
+      - key: Jwt__Audience
+        value: "MediBookNetwork"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ServiceUrls__ApiGateway
@@ -257,6 +289,10 @@ services:
         value: "Host=dpg-d82nft50lvsc738kt0gg-a.ohio-postgres.render.com;Port=5432;Database=medibook_db_11eq;Username=medibook_user;Password=45n9ijVYboJaA9QrLoT92jCcRqvSgGaN;Pooling=true;TrustServerCertificate=true;"
       - key: Jwt__Key
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
+      - key: Jwt__Issuer
+        value: "MediBookAuthService"
+      - key: Jwt__Audience
+        value: "MediBookNetwork"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: ServiceUrls__ApiGateway
