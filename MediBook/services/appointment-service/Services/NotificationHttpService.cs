@@ -98,9 +98,8 @@ namespace appointment_service.Services
             try
             {
                 using var client = new HttpClient();
-                var gatewayUrl = _config["ServiceUrls:ApiGateway"] ?? "http://localhost:5000";
-                // Alternatively, hit provider service directly
-                var response = await client.GetAsync($"http://localhost:5117/api/v1/Provider/{providerId}");
+                var providerUrl = _config["ServiceUrls:ProviderService"] ?? "http://localhost:5117/";
+                var response = await client.GetAsync($"{providerUrl}api/v1/Provider/{providerId}");
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();

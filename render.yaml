@@ -11,6 +11,24 @@ services:
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      - key: ServiceUrls__ApiGateway
+        value: "https://api-gateway-vdad.onrender.com"
+      - key: ServiceUrls__AuthService
+        value: "https://auth-service-ij1y.onrender.com/"
+      - key: ServiceUrls__ProviderService
+        value: "https://provider-service-snol.onrender.com/"
+      - key: ServiceUrls__ScheduleService
+        value: "https://schedule-service-v1rl.onrender.com/"
+      - key: ServiceUrls__AppointmentService
+        value: "https://appointment-service-3khm.onrender.com/"
+      - key: ServiceUrls__PaymentService
+        value: "https://payment-service-bqmj.onrender.com/"
+      - key: ServiceUrls__ReviewService
+        value: "https://review-service-14o7.onrender.com/"
+      - key: ServiceUrls__NotificationService
+        value: "https://notification-service-o9q0.onrender.com/"
+      - key: ServiceUrls__MedicalRecordService
+        value: "https://medical-record-service.onrender.com/"
 
   - type: web
     name: appointment-service
@@ -24,6 +42,24 @@ services:
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      - key: ServiceUrls__ApiGateway
+        value: "https://api-gateway-vdad.onrender.com"
+      - key: ServiceUrls__AuthService
+        value: "https://auth-service-ij1y.onrender.com/"
+      - key: ServiceUrls__ProviderService
+        value: "https://provider-service-snol.onrender.com/"
+      - key: ServiceUrls__ScheduleService
+        value: "https://schedule-service-v1rl.onrender.com/"
+      - key: ServiceUrls__AppointmentService
+        value: "https://appointment-service-3khm.onrender.com/"
+      - key: ServiceUrls__PaymentService
+        value: "https://payment-service-bqmj.onrender.com/"
+      - key: ServiceUrls__ReviewService
+        value: "https://review-service-14o7.onrender.com/"
+      - key: ServiceUrls__NotificationService
+        value: "https://notification-service-o9q0.onrender.com/"
+      - key: ServiceUrls__MedicalRecordService
+        value: "https://medical-record-service.onrender.com/"
 
   - type: web
     name: medical-record-service
@@ -37,6 +73,24 @@ services:
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      - key: ServiceUrls__ApiGateway
+        value: "https://api-gateway-vdad.onrender.com"
+      - key: ServiceUrls__AuthService
+        value: "https://auth-service-ij1y.onrender.com/"
+      - key: ServiceUrls__ProviderService
+        value: "https://provider-service-snol.onrender.com/"
+      - key: ServiceUrls__ScheduleService
+        value: "https://schedule-service-v1rl.onrender.com/"
+      - key: ServiceUrls__AppointmentService
+        value: "https://appointment-service-3khm.onrender.com/"
+      - key: ServiceUrls__PaymentService
+        value: "https://payment-service-bqmj.onrender.com/"
+      - key: ServiceUrls__ReviewService
+        value: "https://review-service-14o7.onrender.com/"
+      - key: ServiceUrls__NotificationService
+        value: "https://notification-service-o9q0.onrender.com/"
+      - key: ServiceUrls__MedicalRecordService
+        value: "https://medical-record-service.onrender.com/"
 
   - type: web
     name: notification-service
@@ -50,6 +104,24 @@ services:
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      - key: ServiceUrls__ApiGateway
+        value: "https://api-gateway-vdad.onrender.com"
+      - key: ServiceUrls__AuthService
+        value: "https://auth-service-ij1y.onrender.com/"
+      - key: ServiceUrls__ProviderService
+        value: "https://provider-service-snol.onrender.com/"
+      - key: ServiceUrls__ScheduleService
+        value: "https://schedule-service-v1rl.onrender.com/"
+      - key: ServiceUrls__AppointmentService
+        value: "https://appointment-service-3khm.onrender.com/"
+      - key: ServiceUrls__PaymentService
+        value: "https://payment-service-bqmj.onrender.com/"
+      - key: ServiceUrls__ReviewService
+        value: "https://review-service-14o7.onrender.com/"
+      - key: ServiceUrls__NotificationService
+        value: "https://notification-service-o9q0.onrender.com/"
+      - key: ServiceUrls__MedicalRecordService
+        value: "https://medical-record-service.onrender.com/"
 
   - type: web
     name: payment-service
@@ -63,6 +135,24 @@ services:
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      - key: ServiceUrls__ApiGateway
+        value: "https://api-gateway-vdad.onrender.com"
+      - key: ServiceUrls__AuthService
+        value: "https://auth-service-ij1y.onrender.com/"
+      - key: ServiceUrls__ProviderService
+        value: "https://provider-service-snol.onrender.com/"
+      - key: ServiceUrls__ScheduleService
+        value: "https://schedule-service-v1rl.onrender.com/"
+      - key: ServiceUrls__AppointmentService
+        value: "https://appointment-service-3khm.onrender.com/"
+      - key: ServiceUrls__PaymentService
+        value: "https://payment-service-bqmj.onrender.com/"
+      - key: ServiceUrls__ReviewService
+        value: "https://review-service-14o7.onrender.com/"
+      - key: ServiceUrls__NotificationService
+        value: "https://notification-service-o9q0.onrender.com/"
+      - key: ServiceUrls__MedicalRecordService
+        value: "https://medical-record-service.onrender.com/"
 
   - type: web
     name: provider-service
@@ -76,6 +166,24 @@ services:
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      - key: ServiceUrls__ApiGateway
+        value: "https://api-gateway-vdad.onrender.com"
+      - key: ServiceUrls__AuthService
+        value: "https://auth-service-ij1y.onrender.com/"
+      - key: ServiceUrls__ProviderService
+        value: "https://provider-service-snol.onrender.com/"
+      - key: ServiceUrls__ScheduleService
+        value: "https://schedule-service-v1rl.onrender.com/"
+      - key: ServiceUrls__AppointmentService
+        value: "https://appointment-service-3khm.onrender.com/"
+      - key: ServiceUrls__PaymentService
+        value: "https://payment-service-bqmj.onrender.com/"
+      - key: ServiceUrls__ReviewService
+        value: "https://review-service-14o7.onrender.com/"
+      - key: ServiceUrls__NotificationService
+        value: "https://notification-service-o9q0.onrender.com/"
+      - key: ServiceUrls__MedicalRecordService
+        value: "https://medical-record-service.onrender.com/"
 
   - type: web
     name: review-service
@@ -89,6 +197,24 @@ services:
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      - key: ServiceUrls__ApiGateway
+        value: "https://api-gateway-vdad.onrender.com"
+      - key: ServiceUrls__AuthService
+        value: "https://auth-service-ij1y.onrender.com/"
+      - key: ServiceUrls__ProviderService
+        value: "https://provider-service-snol.onrender.com/"
+      - key: ServiceUrls__ScheduleService
+        value: "https://schedule-service-v1rl.onrender.com/"
+      - key: ServiceUrls__AppointmentService
+        value: "https://appointment-service-3khm.onrender.com/"
+      - key: ServiceUrls__PaymentService
+        value: "https://payment-service-bqmj.onrender.com/"
+      - key: ServiceUrls__ReviewService
+        value: "https://review-service-14o7.onrender.com/"
+      - key: ServiceUrls__NotificationService
+        value: "https://notification-service-o9q0.onrender.com/"
+      - key: ServiceUrls__MedicalRecordService
+        value: "https://medical-record-service.onrender.com/"
 
   - type: web
     name: schedule-service
@@ -102,6 +228,24 @@ services:
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      - key: ServiceUrls__ApiGateway
+        value: "https://api-gateway-vdad.onrender.com"
+      - key: ServiceUrls__AuthService
+        value: "https://auth-service-ij1y.onrender.com/"
+      - key: ServiceUrls__ProviderService
+        value: "https://provider-service-snol.onrender.com/"
+      - key: ServiceUrls__ScheduleService
+        value: "https://schedule-service-v1rl.onrender.com/"
+      - key: ServiceUrls__AppointmentService
+        value: "https://appointment-service-3khm.onrender.com/"
+      - key: ServiceUrls__PaymentService
+        value: "https://payment-service-bqmj.onrender.com/"
+      - key: ServiceUrls__ReviewService
+        value: "https://review-service-14o7.onrender.com/"
+      - key: ServiceUrls__NotificationService
+        value: "https://notification-service-o9q0.onrender.com/"
+      - key: ServiceUrls__MedicalRecordService
+        value: "https://medical-record-service.onrender.com/"
 
   - type: web
     name: api-gateway
@@ -115,3 +259,21 @@ services:
         value: "ThisIsAVerySecretKeyForJwtAuthenticationThatMustBeAtLeast32BytesLength!"
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      - key: ServiceUrls__ApiGateway
+        value: "https://api-gateway-vdad.onrender.com"
+      - key: ServiceUrls__AuthService
+        value: "https://auth-service-ij1y.onrender.com/"
+      - key: ServiceUrls__ProviderService
+        value: "https://provider-service-snol.onrender.com/"
+      - key: ServiceUrls__ScheduleService
+        value: "https://schedule-service-v1rl.onrender.com/"
+      - key: ServiceUrls__AppointmentService
+        value: "https://appointment-service-3khm.onrender.com/"
+      - key: ServiceUrls__PaymentService
+        value: "https://payment-service-bqmj.onrender.com/"
+      - key: ServiceUrls__ReviewService
+        value: "https://review-service-14o7.onrender.com/"
+      - key: ServiceUrls__NotificationService
+        value: "https://notification-service-o9q0.onrender.com/"
+      - key: ServiceUrls__MedicalRecordService
+        value: "https://medical-record-service.onrender.com/"
