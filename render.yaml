@@ -1,9 +1,3 @@
-databases:
-  - name: medibook-db
-    databaseName: medibook
-    user: medibook_user
-    plan: free
-
 services:
   - type: web
     name: auth-service
@@ -12,9 +6,7 @@ services:
     rootDir: MediBook/services/auth-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: medibook-db
-          property: connectionString
+        sync: false
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: JwtSettings__SecretKey
@@ -27,9 +19,7 @@ services:
     rootDir: MediBook/services/appointment-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: medibook-db
-          property: connectionString
+        sync: false
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -40,9 +30,7 @@ services:
     rootDir: MediBook/services/medical-record-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: medibook-db
-          property: connectionString
+        sync: false
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -53,9 +41,7 @@ services:
     rootDir: MediBook/services/notification-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: medibook-db
-          property: connectionString
+        sync: false
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -66,9 +52,7 @@ services:
     rootDir: MediBook/services/payment-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: medibook-db
-          property: connectionString
+        sync: false
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -79,9 +63,7 @@ services:
     rootDir: MediBook/services/provider-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: medibook-db
-          property: connectionString
+        sync: false
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -92,9 +74,7 @@ services:
     rootDir: MediBook/services/review-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: medibook-db
-          property: connectionString
+        sync: false
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
 
@@ -105,8 +85,6 @@ services:
     rootDir: MediBook/services/schedule-service
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: medibook-db
-          property: connectionString
+        sync: false
       - key: ASPNETCORE_ENVIRONMENT
         value: Production

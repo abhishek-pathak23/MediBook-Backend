@@ -6,7 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>medical_record_service</RootNamespace>
   <UseAppHost>false</UseAppHost>
-  <AssemblyName>MyMedRecSvc</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

@@ -6,7 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>appointment_service</RootNamespace>
     <UseAppHost>false</UseAppHost>
-    <AssemblyName>MyAppointmentSvc1</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
