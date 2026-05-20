@@ -459,4 +459,3 @@ classDiagram
 ```
 
 ---
-`#dotnet` `#microservices` `#csharp` `#backend` `#postgresql` `#api`
